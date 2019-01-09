@@ -116,7 +116,7 @@ var rooms = [
 			if(!room){
 				return false;
 			}
-			if(room.hasUser(user.id)){
+			if(room.getUser(user.id)){
 				room.removeUser(user.id);
 			}
 
@@ -134,7 +134,7 @@ var rooms = [
 			}else if(room.privileged.contains(userToBan)){ // can't ban mods
 				return false;
 			}
-			if(room.hasUser(userToBan)){ 
+			if(room.getUser(userToBan)){ 
 				// ??? add it to sql db directly or via api?
 				// Now do the thing
 				room.users[userToBan].banned = true;
