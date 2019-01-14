@@ -175,7 +175,10 @@ var rooms = [
 							msg.content = msg.content.substring(0, 240);
 						break;
 						case 'emote':
-							if(!isValidEmote(msg.content)){
+							if(!isGlobalEmote(msg.content)){
+								msg = null;
+							}
+							if(typeof room.emotes[msg.content] !== 'object'){
 								msg = null;
 							}
 						break;

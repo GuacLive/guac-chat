@@ -1,7 +1,7 @@
-const validEmotes = [
+const globalEmotes = [
 	'Kappa',
 	'PogChamp'
 ];
-export const isValidEmote = (emote) => {
-	return validEmotes.indexOf(emote);
+export const isGlobalEmote = (emote) => {
+	return globalEmotes.indexOf(emote);
 };
