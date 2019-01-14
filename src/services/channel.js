@@ -6,11 +6,12 @@ export default class ChannelService {
 	}
 
 	async channelUserBan(channel, user) {
-		return await this.ApiService.callApi('/channelUserBan', {
+		return await this.ApiService.callApi('/channel/userBan', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
+			accessToken: process.env.API_SECRET,
 			body: {
 				channel,
 				user
