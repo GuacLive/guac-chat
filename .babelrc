@@ -1,12 +1,18 @@
 {
+	"plugins": [
+		"@babel/plugin-transform-runtime"
+	],
 	"presets": [
 		["@babel/env", {
-			useBuiltIns: "usage",
-			modules: "commonjs",
-			browsers: ["last 2 versions", "safari >= 7"]
-		}],
-		["@babel/stage-1", {
-			"decoratorsLegacy": true
+			"targets": {
+				"node": "current",
+				"browsers": [
+					"last 2 versions",
+					"safari >= 7"
+				]
+			},
+			"modules": "commonjs",
+			"useBuiltIns": "usage"
 		}]
 	]
 }

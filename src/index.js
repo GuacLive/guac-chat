@@ -47,7 +47,7 @@ var rooms = [
 ];
 
 (() => {
-	const socketIO = io(nconf.get('server:port'), {wsEngine: 'uws'});
+	const socketIO = io(nconf.get('server:port'));
 
 	socketIO.adapter(redisAdapter({
 		host: nconf.get('redis:connection:host'),
@@ -81,7 +81,7 @@ var rooms = [
 
 			// TODO: Auth
 			if(token){
-				authedUser = await us.auth(token);
+				authedUser = await us.tokenAuth(token);
 				if(authedUser && authedUser.id){
 					user = new User({
 					  	id: authedUser.id,
@@ -113,7 +113,7 @@ var rooms = [
 		});
 
 		socket.on('disconnect', () => {
-			if(!room){
+			if(!room || !user){
 				return false;
 			}
 			if(room.getUser(user.id)){
@@ -144,7 +144,8 @@ var rooms = [
 		});
 
 		socket.on('message', (msgs) => {
-			if(!room){
+				console.log('bab', room, user, msgs);
+			if(!room || !user){
 				return false;
 			}
 			if(!room.getUser(user.id) || user.anon){ 
@@ -189,6 +190,7 @@ var rooms = [
 					if(msg === null){
 						delete msgs[i];
 					}else{
+						msg.time = (new Date).getTime();
 						msgs[i] = msg;
 					}
 					if(i == msg.length - 1){

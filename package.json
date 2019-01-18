@@ -18,18 +18,20 @@
   "homepage": "https://github.com/GuacLive/guac-chat#readme",
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.42",
+    "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.0.0-beta.40",
     "@babel/preset-react": "^7.0.0-beta.40",
     "@babel/preset-stage-1": "^7.0.0-beta.40",
-    "@babel/register": "^7.0.0-beta.42"
+    "@babel/register": "^7.0.0-beta.42",
+    "@babel/runtime": "^7.2.0"
   },
   "dependencies": {
     "cross-fetch": "^2.2.1",
     "jsonwebtoken": "^8.2.1",
     "linkify-urls": "^2.0.0",
     "nconf": "^0.10.0",
+    "regenerator-runtime": "^0.13.1",
     "socket.io": "^2.1.1",
-    "socket.io-redis": "^5.2.0",
-    "uws": "^10.148.1"
+    "socket.io-redis": "^5.2.0"
   }
 }
