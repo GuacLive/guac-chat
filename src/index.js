@@ -67,6 +67,12 @@ var rooms = [
 		let user = null;
 
 		socket.on('join', async (token) => {
+			if(typeof roomID !== 'string'){
+				console.log(roomID, 'Invalid room type');
+				socketIO.to(roomID).emit('sys', 'Invalid room type');  
+				return;
+			}
+
 			socket.emit('viewers', 
 				socketIO.sockets.adapter.rooms[roomID]
 				&& socketIO.sockets.adapter.rooms[roomID].length
@@ -79,7 +85,17 @@ var rooms = [
 				});
 			}
 
-			// TODO: Auth
+			// Get channel info, and check if valid
+			channelInfo = await cs.getChannel(roomID);
+			if(channelInfo && channelInfo.id){
+				room.owner = channelInfo.user.id;
+			}else{
+				console.error(roomID, channelInfo);
+				socketIO.to(roomID).emit('sys', 'Channel does not exist');
+				return;
+			}
+
+			// Authenticate user
 			if(token){
 				authedUser = await us.tokenAuth(token);
 				if(authedUser && authedUser.id){
@@ -90,7 +106,8 @@ var rooms = [
 					});
 				}else{
 					console.error(token, authedUser);
-					//return;
+					socketIO.to(roomID).emit('sys', 'User token is not valid');  
+					return;
 				}
 			}else{
 				user = new User();
@@ -102,7 +119,7 @@ var rooms = [
 				socket.join(roomID);
 				if(!user.anon){
 					socketIO.to(roomID).emit('join', user);
-					socketIO.to(roomID).emit('sys', user + 'has joined', room);  
+					socketIO.to(roomID).emit('sys', user + 'has joined', room);
 					console.log(JSON.stringify(user) + ' joined' + roomID);
 				}
 			}
@@ -135,7 +152,6 @@ var rooms = [
 				return false;
 			}
 			if(room.getUser(userToBan)){ 
-				// ??? add it to sql db directly or via api?
 				// Now do the thing
 				room.users[userToBan].banned = true;
 				await cs.channelUserBan(room.id, userToBan);
@@ -144,7 +160,7 @@ var rooms = [
 		});
 
 		socket.on('message', (msgs) => {
-				console.log('bab', room, user, msgs);
+			console.log('bab', room, user, msgs);
 			if(!room || !user){
 				return false;
 			}

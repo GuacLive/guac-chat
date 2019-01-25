@@ -5,6 +5,7 @@ class Room {
 		this.users = {};
 		this.privileged = [];
 		this.emotes = {};
+		this.owner = null;
 	}
 
 	addUser(args){
