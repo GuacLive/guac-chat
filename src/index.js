@@ -83,18 +83,18 @@ var rooms = [
 					id: roomID,
 					name: `Room ${roomID}`
 				});
-			}
 
-			// Get channel info, and check if valid
-			channelInfo = await cs.getChannel(roomID);
-			if(channelInfo && channelInfo.id){
-				room.owner = channelInfo.user.id;
-			}else{
-				console.error(roomID, channelInfo);
-				socketIO.to(roomID).emit('sys', 'Channel does not exist');
-				return;
-			}
+				// Get channel info, and check if valid
+				channelInfo = await cs.getChannel(roomID);
+				if(channelInfo && channelInfo.id){
+					room.owner = channelInfo.user.id;
+				}else{
+					console.error(roomID, channelInfo);
+					socketIO.to(roomID).emit('sys', 'Channel does not exist');
+					return;
+				}
 
+			}
 			// Authenticate user
 			if(token){
 				authedUser = await us.tokenAuth(token);
