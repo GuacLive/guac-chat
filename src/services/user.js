@@ -18,9 +18,6 @@ export default class UserService {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
-			if (json.statusCode !== 200) {
-				return Promise.reject(json);
-			}
 			return json;
 		})
 		.catch(error => {

@@ -69,7 +69,7 @@ var rooms = [
 		socket.on('join', async (token) => {
 			if(typeof roomID !== 'string'){
 				console.log(roomID, 'Invalid room type');
-				socketIO.to(roomID).emit('sys', 'Invalid room type');  
+				socket.emit('sys', 'Invalid room type');  
 				return;
 			}
 
@@ -85,19 +85,19 @@ var rooms = [
 				});
 
 				// Get channel info, and check if valid
-				channelInfo = await cs.getChannel(roomID);
-				if(channelInfo && channelInfo.id){
-					room.owner = channelInfo.user.id;
+				let channelInfo = await cs.getChannel(roomID);
+				if(channelInfo && channelInfo.data && channelInfo.data.id){
+					room.owner = channelInfo.data.user.id;
 				}else{
 					console.error(roomID, channelInfo);
-					socketIO.to(roomID).emit('sys', 'Channel does not exist');
+					socket.emit('sys', 'Channel does not exist');
 					return;
 				}
 
 			}
 			// Authenticate user
 			if(token){
-				authedUser = await us.tokenAuth(token);
+				let authedUser = await us.tokenAuth(token);
 				if(authedUser && authedUser.id){
 					user = new User({
 					  	id: authedUser.id,
@@ -106,7 +106,7 @@ var rooms = [
 					});
 				}else{
 					console.error(token, authedUser);
-					socketIO.to(roomID).emit('sys', 'User token is not valid');  
+					socket.emit('sys', 'User token is not valid');  
 					return;
 				}
 			}else{
@@ -118,8 +118,8 @@ var rooms = [
 
 				socket.join(roomID);
 				if(!user.anon){
-					socketIO.to(roomID).emit('join', user);
-					socketIO.to(roomID).emit('sys', user + 'has joined', room);
+					socketIO.sockets.in(roomID).emit('join', user);
+					socketIO.sockets.in(roomID).emit('sys', user + 'has joined', room);
 					console.log(JSON.stringify(user) + ' joined' + roomID);
 				}
 			}
@@ -139,8 +139,8 @@ var rooms = [
 
 			socket.leave(roomID);
 			if(!user.anon){
-				socketIO.to(roomID).emit('leave', user);
-				socketIO.to(roomID).emit('sys', user.name + ' has left', room);
+				socketIO.sockets.in(roomID).emit('leave', user);
+				socketIO.sockets.in(roomID).emit('sys', user.name + ' has left', room);
 				console.log(JSON.stringify(user) + ' has left ' + roomID);
 			}
 		});
@@ -211,7 +211,7 @@ var rooms = [
 					}
 					if(i == msg.length - 1){
 						room.users[user].lastMessage = (new Date).getTime();
-						socketIO.to(roomID).emit('msgs', user, msgs);
+						socketIO.sockets.in(roomID).emit('msgs', user, msgs);
 					}
 				});
 			}
