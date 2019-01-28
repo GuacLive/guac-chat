@@ -21,7 +21,7 @@ export default class ChannelService {
 			if (json.statusCode !== 200) {
 				return Promise.reject(json);
 			}
-			return json;
+			return json && json.data;
 		})
 		.catch(error => {
 			throw error;

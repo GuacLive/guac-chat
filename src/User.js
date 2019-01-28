@@ -1,7 +1,7 @@
 class User {
 	constructor(id, name, heartbeat){
-		this.id = id;
-		this.name = name;
+		if(id) this.id = id;
+		if(name) this.name = name;
 		this.anon = true;
 		this.heartbeat = (new Date).getTime();
 		this.lastMessage = null;

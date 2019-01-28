@@ -79,38 +79,41 @@ var rooms = [
 			);
 
 			if(!room){
-				rooms[roomID] = room = new Room({
-					id: roomID,
-					name: `Room ${roomID}`
-				});
+				rooms[roomID] = room = new Room(
+					roomID,
+					`Room ${roomID}`
+				);
 
 				// Get channel info, and check if valid
 				let channelInfo = await cs.getChannel(roomID);
-				if(channelInfo && channelInfo.data && channelInfo.data.id){
-					room.owner = channelInfo.data.user.id;
+				if(channelInfo && channelInfo.id){
+					room.owner = channelInfo.user.id;
 				}else{
 					console.error(roomID, channelInfo);
 					socket.emit('sys', 'Channel does not exist');
 					return;
 				}
-
 			}
 			// Authenticate user
 			if(token){
 				let authedUser = await us.tokenAuth(token);
+				console.log('authedUser', authedUser);
 				if(authedUser && authedUser.id){
-					user = new User({
-					  	id: authedUser.id,
-					  	name: authedUser.name,
-					  	anon: false
-					});
+					user = new User(
+						authedUser.id,
+					  	authedUser.name,
+					  	false
+					);
 				}else{
 					console.error(token, authedUser);
 					socket.emit('sys', 'User token is not valid');  
 					return;
 				}
 			}else{
-				user = new User();
+				user = new User(
+					false,
+					'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000
+				);
 			}
 
 			if(room.users){
@@ -133,8 +136,8 @@ var rooms = [
 			if(!room || !user){
 				return false;
 			}
-			if(room.getUser(user.id)){
-				room.removeUser(user.id);
+			if(room.getUser(user.name)){
+				room.removeUser(user.name);
 			}
 
 			socket.leave(roomID);
@@ -164,11 +167,12 @@ var rooms = [
 			if(!room || !user){
 				return false;
 			}
-			if(!room.getUser(user.id) || user.anon){ 
-				socket.emit('err', {
+			if(!room.getUser(user.name) || user.anon){ 
+				console.error({
 					statusCode: 403, 
 					message: 'USER_NOT_AUTHED'
 				});
+				socket.emit('sys', 'User is not authenticated');  
 				return false;
 			}
 			if(room.users[user.id] 
