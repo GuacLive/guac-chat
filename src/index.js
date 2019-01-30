@@ -75,8 +75,8 @@ var rooms = [
 			}
 
 			socket.emit('viewers', 
-				socketIO.sockets.adapter.rooms[roomID]
-				&& socketIO.sockets.adapter.rooms[roomID].length
+				Object.keys(socketIO.in(roomID).clients().connected)
+				&& Object.keys(socketIO.in(roomID).clients().connected).length
 			);
 
 			if(!room){
