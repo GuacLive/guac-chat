@@ -112,7 +112,8 @@ var rooms = [
 			}else{
 				user = new User(
 					false,
-					'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000
+					'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000,
+					true
 				);
 			}
 
@@ -122,7 +123,7 @@ var rooms = [
 				socket.join(roomID);
 				if(!user.anon){
 					socketIO.sockets.in(roomID).emit('join', user);
-					socketIO.sockets.in(roomID).emit('sys', user + 'has joined', room);
+					socketIO.sockets.in(roomID).emit('sys', user.name + ' has joined', room);
 					console.log(JSON.stringify(user) + ' joined' + roomID);
 				}
 			}
@@ -181,7 +182,7 @@ var rooms = [
 			){
 				return false;
 			}
-			if(typeof msgs == 'array'){
+			if(typeof msgs == 'object'){
 				msgs.forEach((msg, i) => {
 					if(!msg.type){
 						return false;
@@ -190,18 +191,17 @@ var rooms = [
 						return;
 					}
 					switch(msg.type){
-						case 'message':
+						case 'text':
 							// todo: filter
 							msg.content = linkifyUrls(msg.content);
 							msg.content = msg.content.substring(0, 240);
 						break;
 						case 'emote':
-							if(!isGlobalEmote(msg.content)){
+							/*if(!isGlobalEmote(msg.content)){
 								msg = null;
-							}
-							if(typeof room.emotes[msg.content] !== 'object'){
+							}else if(typeof room.emotes[msg.content] !== 'object'){
 								msg = null;
-							}
+							}*/
 						break;
 						default:
 							return false;
@@ -210,11 +210,11 @@ var rooms = [
 					if(msg === null){
 						delete msgs[i];
 					}else{
-						msg.time = (new Date).getTime();
 						msgs[i] = msg;
 					}
-					if(i == msg.length - 1){
-						room.users[user].lastMessage = (new Date).getTime();
+					if(i == msgs.length - 1){
+						msgs.time = (new Date).getTime();
+						room.getUser(user.name).lastMessage = (new Date).getTime();
 						socketIO.sockets.in(roomID).emit('msgs', user, msgs);
 					}
 				});

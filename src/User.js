@@ -1,8 +1,8 @@
 class User {
-	constructor(id, name, heartbeat){
+	constructor(id, name, anon){
 		if(id) this.id = id;
 		if(name) this.name = name;
-		this.anon = true;
+		this.anon = anon;
 		this.heartbeat = (new Date).getTime();
 		this.lastMessage = null;
 		this.banned = false;
