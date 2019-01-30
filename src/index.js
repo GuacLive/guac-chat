@@ -99,11 +99,16 @@ var rooms = [
 				let authedUser = await us.tokenAuth(token);
 				console.log('authedUser', authedUser);
 				if(authedUser && authedUser.id){
-					user = new User(
-						authedUser.id,
-					  	authedUser.name,
-					  	false
-					);
+					if(room.getUser(authedUser.name)){
+						user = room.getUser(authedUser.name);
+						return false;
+					}else{
+						user = new User(
+							authedUser.id,
+						  	authedUser.name,
+						  	false
+						);
+					}
 				}else{
 					console.error(token, authedUser);
 					socket.emit('sys', 'User token is not valid');  
