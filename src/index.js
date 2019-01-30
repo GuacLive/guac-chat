@@ -60,6 +60,7 @@ var rooms = [
 
 	socketIO.on('connection', (socket) => {
 		var url = socket.request.headers.referer;
+		if(!url) return;
 		console.log(url);
 		var splited = url.split('/');
 		var roomID = splited[splited.length - 1];
@@ -149,7 +150,7 @@ var rooms = [
 			socket.leave(roomID);
 			if(!user.anon){
 				socketIO.sockets.in(roomID).emit('leave', user);
-				socketIO.sockets.in(roomID).emit('sys', user.name + ' has left', room);
+				//socketIO.sockets.in(roomID).emit('sys', user.name + ' has left', room);
 				console.log(JSON.stringify(user) + ' has left ' + roomID);
 			}
 		});
