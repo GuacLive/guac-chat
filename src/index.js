@@ -156,7 +156,7 @@ var rooms = [
 		});
 
 		socket.on('ban', async (userToBan) => {
-			if(!room.privileged.contains(user.id)){ // is this user not a mod?
+			if(!room.privileged.contains(user.name)){ // is this user not a mod?
 				return false;
 			}else if(room.privileged.contains(userToBan)){ // can't ban mods
 				return false;
