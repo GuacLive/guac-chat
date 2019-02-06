@@ -156,7 +156,7 @@ var rooms = [
 		});
 
 		socket.on('ban', async (userToBan) => {
-			if(!room.privileged.contains(user.name)){ // is this user not a mod?
+			if(!room.privileged.contains(user.id)){ // is this user not a mod?
 				return false;
 			}else if(room.privileged.contains(userToBan)){ // can't ban mods
 				return false;
@@ -165,6 +165,21 @@ var rooms = [
 				// Now do the thing
 				room.users[userToBan].banned = true;
 				await cs.channelUserBan(room.id, userToBan);
+			}
+			return false;
+		});
+
+
+		socket.on('unban', async (userToBan) => {
+			if(!room.privileged.contains(user.id)){ // is this user not a mod?
+				return false;
+			}else if(room.privileged.contains(userToBan)){ // can't ban mods
+				return false;
+			}
+			if(room.getUser(userToBan)){ 
+				// Now do the thing
+				room.users[userToBan].banned = false;
+				await cs.channelUserUnban(room.id, userToBan);
 			}
 			return false;
 		});
