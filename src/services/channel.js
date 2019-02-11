@@ -35,10 +35,10 @@ export default class ChannelService {
 				'Content-Type': 'application/json'
 			},
 			accessToken: process.env.API_SECRET,
-			body: {
+			body: JSON.stringify({
 				channel,
 				user
-			}
+			})
 		})
 		.then(response => response.json())
 		.then((json) => {
@@ -62,10 +62,10 @@ export default class ChannelService {
 				'Content-Type': 'application/json'
 			},
 			accessToken: process.env.API_SECRET,
-			body: {
+			body: JSON.stringify({
 				channel,
 				user
-			}
+			})
 		})
 		.then(response => response.json())
 		.then((json) => {

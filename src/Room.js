@@ -19,6 +19,16 @@ class Room {
 		return user;
 	}
 
+	 getUserById(id){
+		if(!id) return null;
+		//const normalized = name.toLowerCase();
+		let username =  Array.from(this.users).map((data) => {
+			if(data.length < 2) return;
+			if(data[1].id === id) return data[0].toLowerCase();
+		});
+		return username ? this.getUser(username[0]) : false;
+	}
+
 	getUser(name){
 		if(!name) return null;
 		const normalized = name.toLowerCase();

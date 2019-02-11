@@ -89,6 +89,7 @@ var rooms = [
 				let channelInfo = await cs.getChannel(roomID);
 				if(channelInfo && channelInfo.id){
 					room.owner = channelInfo.user.id;
+					room.privileged.push(room.owner);
 				}else{
 					console.error(roomID, channelInfo);
 					socket.emit('sys', 'Channel does not exist');
@@ -156,14 +157,15 @@ var rooms = [
 		});
 
 		socket.on('ban', async (userToBan) => {
-			if(!room.privileged.contains(user.id)){ // is this user not a mod?
+			console.log('spellspell', room.privileged, user.id, userToBan)
+			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
-			}else if(room.privileged.contains(userToBan)){ // can't ban mods
+			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
 				return false;
 			}
-			if(room.getUser(userToBan)){ 
+			if(user = room.getUserById(userToBan)){ 
 				// Now do the thing
-				room.users[userToBan].banned = true;
+				user.banned = true;
 				await cs.channelUserBan(room.id, userToBan);
 			}
 			return false;
@@ -171,14 +173,14 @@ var rooms = [
 
 
 		socket.on('unban', async (userToBan) => {
-			if(!room.privileged.contains(user.id)){ // is this user not a mod?
+			if(!room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
-			}else if(room.privileged.contains(userToBan)){ // can't ban mods
+			}else if(room.privileged.indexOf(userToBan) === -1){ // can't ban mods
 				return false;
 			}
-			if(room.getUser(userToBan)){ 
+			if(user = room.getUserById(userToBan)){ 
 				// Now do the thing
-				room.users[userToBan].banned = false;
+				user.banned = false;
 				await cs.channelUserUnban(room.id, userToBan);
 			}
 			return false;
