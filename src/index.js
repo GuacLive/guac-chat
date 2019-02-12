@@ -46,6 +46,8 @@ var rooms = [
 
 ];
 
+const COOLDOWN_TIME = 30; // in seconds
+
 (() => {
 	const socketIO = io(nconf.get('server:port'));
 
@@ -199,10 +201,17 @@ var rooms = [
 				socket.emit('sys', 'User is not authenticated');  
 				return false;
 			}
-			if(room.users[user.id] 
-				&& (room.users[user.id].banned 
-					|| room.users[user.id].lastMessage < (new Date).getTime()-30*1000/*30sec*/)
+			let now = (new Date).getTime();
+			if(room.getUser(user.name)
+				&& (room.getUser(user.name).banned 
+					|| (
+						room.getUser(user.name).lastMessage &&
+						(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000))
+					)
 			){
+				socket.emit('sys', room.getUser(user.name).banned ?
+					'You are banned.'
+					: `You are typing too fast (${COOLDOWN_TIME} seconds).`);
 				return false;
 			}
 			if(typeof msgs == 'object'){
