@@ -89,7 +89,7 @@ const COOLDOWN_TIME = 30; // in seconds
 
 				// Get channel info, and check if valid
 				let channelInfo = await cs.getChannel(roomID);
-				if(channelInfo && channelInfo.id){
+				if(channelInfo && typeof channelInfo.id === 'number'){
 					room.owner = channelInfo.user.id;
 					room.privileged.push(room.owner);
 				}else{
@@ -102,7 +102,7 @@ const COOLDOWN_TIME = 30; // in seconds
 			if(token){
 				let authedUser = await us.tokenAuth(token);
 				console.log('authedUser', authedUser);
-				if(authedUser && authedUser.id){
+				if(authedUser && typeof authedUser.id === 'number'){
 					if(room.getUser(authedUser.name)){
 						user = room.getUser(authedUser.name);
 						return false;
