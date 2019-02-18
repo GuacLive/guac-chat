@@ -130,6 +130,7 @@ const COOLDOWN_TIME = 30; // in seconds
 				room.addUser(user);
 
 				socket.join(roomID);
+				socket.emit('users', [...room.users]);
 				if(!user.anon){
 					socketIO.sockets.in(roomID).emit('join', user);
 					socketIO.sockets.in(roomID).emit('sys', user.name + ' has joined', room);
