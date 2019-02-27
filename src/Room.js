@@ -4,6 +4,7 @@ class Room {
 		this.name = name;
 		this.users = new Map();
 		this.privileged = [];
+		this.bans = [];
 		this.emotes = {};
 		this.owner = null;
 	}
@@ -39,6 +40,12 @@ class Room {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
 		return this.users.delete(normalized) || false;
+	}
+
+	isUserBanned(name){
+		if(!name) return null;
+		const normalized = name.toLowerCase();
+		return this.bans.indexOf(normalized) >= 0 || this.users.get(normalized).banned;
 	}
 }
 export default Room;

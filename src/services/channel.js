@@ -28,6 +28,32 @@ export default class ChannelService {
 		});
 	}
 
+	async getChannelBans(channel) {
+		return await this.ApiService.callApi('/channel/bans', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			accessToken: process.env.API_SECRET,
+			body: JSON.stringify({
+				channel
+			})
+		})
+		.then(response => response.json())
+		.then((json) => {
+			if (!('statusCode' in json)) {
+				return Promise.reject(json);
+			}
+			if (json.statusCode !== 200) {
+				return Promise.reject(json);
+			}
+			return json;
+		})
+		.catch(error => {
+			throw error;
+		});
+	}
+
 	async channelUserBan(channel, user) {
 		return await this.ApiService.callApi('/channel/userBan', {
 			method: 'POST',

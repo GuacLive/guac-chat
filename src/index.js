@@ -105,6 +105,9 @@ const COOLDOWN_TIME = 30; // in seconds
 				if(authedUser && typeof authedUser.id === 'number'){
 					if(room.getUser(authedUser.name)){
 						user = room.getUser(authedUser.name);
+						if(room.bans.indexOf(user.name) >= 0){
+							user.banned = true;
+						}
 						return false;
 					}else{
 						user = new User(
@@ -166,10 +169,12 @@ const COOLDOWN_TIME = 30; // in seconds
 			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
 				return false;
 			}
+
+			room.bans.push(userToBan);
+			await cs.channelUserBan(room.id, userToBan);
 			if(user = room.getUserById(userToBan)){ 
 				// Now do the thing
 				user.banned = true;
-				await cs.channelUserBan(room.id, userToBan);
 			}
 			return false;
 		});
@@ -181,10 +186,11 @@ const COOLDOWN_TIME = 30; // in seconds
 			}else if(room.privileged.indexOf(userToBan) === -1){ // can't ban mods
 				return false;
 			}
+			rooms.bans = rooms.ban.slice(0, rooms.bans.indexOf(userToBan));
+			await cs.channelUserUnban(room.id, userToBan);
 			if(user = room.getUserById(userToBan)){ 
 				// Now do the thing
 				user.banned = false;
-				await cs.channelUserUnban(room.id, userToBan);
 			}
 			return false;
 		});
@@ -204,13 +210,13 @@ const COOLDOWN_TIME = 30; // in seconds
 			}
 			let now = (new Date).getTime();
 			if(room.getUser(user.name)
-				&& (room.getUser(user.name).banned 
+				&& (room.isUserBanned(user.name)
 					|| (
 						room.getUser(user.name).lastMessage &&
 						(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000))
 					)
 			){
-				socket.emit('sys', room.getUser(user.name).banned ?
+				socket.emit('sys', room.isUserBanned(user.name) ?
 					'You are banned.'
 					: `You are typing too fast (${COOLDOWN_TIME} seconds).`);
 				return false;
