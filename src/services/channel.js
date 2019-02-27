@@ -54,17 +54,18 @@ export default class ChannelService {
 		});
 	}
 
-	async channelUserBan(channel, user) {
+	async channelUserBan(channel, user, type = 'user_id') {
+		let json = {
+				channel
+		};
+		json[type] = user;
 		return await this.ApiService.callApi('/channel/userBan', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			accessToken: process.env.API_SECRET,
-			body: JSON.stringify({
-				channel,
-				user
-			})
+			body: JSON.stringify(json)
 		})
 		.then(response => response.json())
 		.then((json) => {
@@ -81,17 +82,18 @@ export default class ChannelService {
 		});
 	}
 
-	async channelUserUnban(channel, user) {
+	async channelUserUnban(channel, user, type = 'user_id') {
+		let json = {
+				channel
+		};
+		json[type] = user;
 		return await this.ApiService.callApi('/channel/userUnban', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			accessToken: process.env.API_SECRET,
-			body: JSON.stringify({
-				channel,
-				user
-			})
+			body: JSON.stringify(json)
 		})
 		.then(response => response.json())
 		.then((json) => {

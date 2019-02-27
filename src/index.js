@@ -186,7 +186,7 @@ const COOLDOWN_TIME = 30; // in seconds
 			}else if(room.privileged.indexOf(userToBan) === -1){ // can't ban mods
 				return false;
 			}
-			rooms.bans = rooms.ban.slice(0, rooms.bans.indexOf(userToBan));
+			rooms.bans = rooms.bans.slice(0, rooms.bans.indexOf(userToBan));
 			await cs.channelUserUnban(room.id, userToBan);
 			if(user = room.getUserById(userToBan)){ 
 				// Now do the thing
