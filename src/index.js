@@ -164,6 +164,7 @@ const COOLDOWN_TIME = 30; // in seconds
 
 		socket.on('ban', async (userToBan) => {
 			console.log('spellspell', room.privileged, user.id, userToBan)
+			if(typeof userToBan !== 'number') return false;
 			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
 			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
@@ -181,6 +182,7 @@ const COOLDOWN_TIME = 30; // in seconds
 
 
 		socket.on('unban', async (userToBan) => {
+			if(typeof userToBan !== 'number') return false;
 			if(!room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
 			}else if(room.privileged.indexOf(userToBan) === -1){ // can't ban mods
