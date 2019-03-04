@@ -30,8 +30,6 @@ import redisAdapter from 'socket.io-redis';
 
 import linkifyUrls from 'linkify-urls';
 
-import jsonwebtoken from 'jsonwebtoken';
-
 import Room from './Room';
 
 import User from './User';
@@ -39,8 +37,6 @@ import User from './User';
 import UserService from './services/user';
 
 import ChannelService from './services/channel';
-
-import { isValidEmote } from './Emote';
 
 var rooms = [
 
@@ -180,7 +176,6 @@ const COOLDOWN_TIME = 30; // in seconds
 			return false;
 		});
 
-
 		socket.on('unban', async (userToBan) => {
 			if(typeof userToBan !== 'number') return false;
 			if(!room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
@@ -193,6 +188,24 @@ const COOLDOWN_TIME = 30; // in seconds
 			if(user = room.getUserById(userToBan)){ 
 				// Now do the thing
 				user.banned = false;
+			}
+			return false;
+		});
+
+		socket.on('timeout', async (userToBan, time) => {
+			console.log('spellspell', room.privileged, user.id, userToBan, time)
+			if(typeof userToBan !== 'number' || typeof time !== 'number') return false;
+			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
+				return false;
+			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
+				return false;
+			}
+
+			room.timeouts[userToBan] = time > 0 ? (new Date).getTime() + time : time;
+			await cs.channelUserTimeout(room.id, userToBan, room.timeouts[userToBan]);
+			if(user = room.getUserById(userToBan)){ 
+				// Now do the thing
+				user.timeout = room.timeouts[userToBan];
 			}
 			return false;
 		});
@@ -211,17 +224,22 @@ const COOLDOWN_TIME = 30; // in seconds
 				return false;
 			}
 			let now = (new Date).getTime();
-			if(room.getUser(user.name)
-				&& (room.isUserBanned(user.name)
-					|| (
-						room.getUser(user.name).lastMessage &&
-						(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000))
-					)
-			){
-				socket.emit('sys', room.isUserBanned(user.name) ?
-					'You are banned.'
-					: `You are typing too fast (${COOLDOWN_TIME} seconds).`);
-				return false;
+			if(room.getUser(user.name)){
+				if(room.isUserBanned(user.name)){
+					socket.emit('sys', 'You are banned.');
+					return false;
+				}
+
+				if (room.isUserTimedout(user.name)) {
+					socket.emit('sys', `You are timed out.`);
+					return false;
+				}
+
+				if(room.getUser(user.name).lastMessage &&
+					(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000)){
+						socket.emit('sys', `You are typing too fast (${COOLDOWN_TIME} seconds).`);
+						return false;
+				}
 			}
 			if(typeof msgs == 'object'){
 				msgs.forEach((msg, i) => {

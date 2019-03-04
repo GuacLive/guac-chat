@@ -5,6 +5,7 @@ class Room {
 		this.users = new Map();
 		this.privileged = [];
 		this.bans = [];
+		this.timeouts = [];
 		this.emotes = {};
 		this.owner = null;
 	}
@@ -46,6 +47,13 @@ class Room {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
 		return this.bans.indexOf(normalized) >= 0 || this.users.get(normalized).banned;
+	}
+
+	isUserTimedout(name) {
+		if(!name) return null;
+		const normalized = name.toLowerCase();
+		let user = this.timeouts.indexOf(normalized);
+		return (user && user.time >= (new Date).getTime());
 	}
 }
 export default Room;

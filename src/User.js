@@ -6,6 +6,7 @@ class User {
 		this.heartbeat = (new Date).getTime();
 		this.lastMessage = null;
 		this.banned = false;
+		this.timeout = null;
 		this.privileges = [];
 	}
 
