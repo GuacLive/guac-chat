@@ -169,7 +169,8 @@ const COOLDOWN_TIME = 30; // in seconds
 
 			room.bans.push(userToBan);
 			await cs.channelUserBan(room.id, userToBan);
-			if(user = room.getUserById(userToBan)){ 
+			if(user = room.getUserById(userToBan)){
+				socket.emit('sys', `${user.name} has been banned`);  
 				// Now do the thing
 				user.banned = true;
 			}
@@ -185,7 +186,8 @@ const COOLDOWN_TIME = 30; // in seconds
 			}
 			rooms.bans = rooms.bans.slice(0, rooms.bans.indexOf(userToBan));
 			await cs.channelUserUnban(room.id, userToBan);
-			if(user = room.getUserById(userToBan)){ 
+			if(user = room.getUserById(userToBan)){
+				socket.emit('sys', `${user.name} has been unbanned`);
 				// Now do the thing
 				user.banned = false;
 			}
@@ -203,7 +205,8 @@ const COOLDOWN_TIME = 30; // in seconds
 
 			room.timeouts[userToBan] = time > 0 ? (new Date).getTime() + time : time;
 			await cs.channelUserTimeout(room.id, userToBan, room.timeouts[userToBan]);
-			if(user = room.getUserById(userToBan)){ 
+			if(user = room.getUserById(userToBan)){
+				socket.emit('sys', `${user.name} has been timed out for ${time} seconds`);
 				// Now do the thing
 				user.timeout = room.timeouts[userToBan];
 			}
