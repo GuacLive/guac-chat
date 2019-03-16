@@ -21,14 +21,14 @@ class Room {
 		return user;
 	}
 
-	 getUserById(id){
-		if(!id) return null;
+	getUserById(id){
+		if(typeof id !== 'number') return null;
 		//const normalized = name.toLowerCase();
 		let username =  Array.from(this.users).map((data) => {
 			if(data.length < 2) return;
 			if(data[1].id === id) return data[0].toLowerCase();
 		});
-		return username ? this.getUser(username[0]) : false;
+		return username ? this.getUser(username[1]) : false;
 	}
 
 	getUser(name){
@@ -43,10 +43,10 @@ class Room {
 		return this.users.delete(normalized) || false;
 	}
 
-	isUserBanned(name){
-		if(!name) return null;
+	isUserBanned(name, id){
+		if(!name || typeof id !== 'number') return null;
 		const normalized = name.toLowerCase();
-		return this.bans.indexOf(normalized) >= 0 || this.users.get(normalized).banned;
+		return this.bans.indexOf(id) >= 0 || this.users.get(normalized).banned;
 	}
 
 	isUserTimedout(name) {

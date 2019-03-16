@@ -40,14 +40,21 @@ export default class ChannelService {
 			})
 		})
 		.then(response => response.json())
-		.then((json) => {
+		.then(async (json) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
 			if (json.statusCode !== 200) {
 				return Promise.reject(json);
 			}
-			return json;
+			let bans = [];
+			if(json && json.data){
+				await json.data.forEach(async (data) => {
+					if(bans.indexOf(data.user_id) > -1) return;
+					bans.push(data.user_id);
+				})
+			}
+			return bans;
 		})
 		.catch(error => {
 			throw error;

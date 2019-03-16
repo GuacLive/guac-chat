@@ -61,35 +61,38 @@ const COOLDOWN_TIME = 30; // in seconds
 		if(!url) return;
 		console.log(url);
 		var splited = url.split('/');
-		var roomID = splited[splited.length - 1];
-		let room = rooms[roomID];
+		var roomName = splited[splited.length - 1];
+		let room = rooms[roomName];
 		let user = null;
 
 		socket.on('join', async (token) => {
-			if(typeof roomID !== 'string'){
-				console.log(roomID, 'Invalid room type');
+			if(typeof roomName !== 'string'){
+				console.log(roomName, 'Invalid room type');
 				socket.emit('sys', 'Invalid room type');  
 				return;
 			}
 
 			socket.emit('viewers', 
-				Object.keys(socketIO.in(roomID).clients().connected)
-				&& Object.keys(socketIO.in(roomID).clients().connected).length
+				Object.keys(socketIO.in(roomName).clients().connected)
+				&& Object.keys(socketIO.in(roomName).clients().connected).length
 			);
 
 			if(!room){
-				rooms[roomID] = room = new Room(
-					roomID,
-					`Room ${roomID}`
+				rooms[roomName] = room = new Room(
+					null,
+					roomName
 				);
 
 				// Get channel info, and check if valid
-				let channelInfo = await cs.getChannel(roomID);
+				let channelInfo = await cs.getChannel(roomName);
 				if(channelInfo && typeof channelInfo.id === 'number'){
 					room.owner = channelInfo.user.id;
+					room.id = channelInfo.id;
 					room.privileged.push(room.owner);
+					let channelBans = await cs.getChannelBans(room.id);
+					if(channelBans) room.bans = channelBans;
 				}else{
-					console.error(roomID, channelInfo);
+					console.error(roomName, channelInfo);
 					socket.emit('sys', 'Channel does not exist');
 					return;
 				}
@@ -101,7 +104,7 @@ const COOLDOWN_TIME = 30; // in seconds
 				if(authedUser && typeof authedUser.id === 'number'){
 					if(room.getUser(authedUser.name)){
 						user = room.getUser(authedUser.name);
-						if(room.bans.indexOf(user.name) >= 0){
+						if(room.bans.indexOf(user.id) >= 0){
 							user.banned = true;
 						}
 						return false;
@@ -111,6 +114,10 @@ const COOLDOWN_TIME = 30; // in seconds
 						  	authedUser.name,
 						  	false
 						);
+						if(room.bans.indexOf(authedUser.id) >= 0){
+							user.banned = true;
+						}
+						//user.banned = authedUser.banned;
 					}
 				}else{
 					console.error(token, authedUser);
@@ -125,15 +132,16 @@ const COOLDOWN_TIME = 30; // in seconds
 				);
 			}
 
+			socket.emit('privileged', room.privileged);
 			if(room.users){
 				room.addUser(user);
 
-				socket.join(roomID);
+				socket.join(roomName);
 				socket.emit('users', [...room.users]);
 				if(!user.anon){
-					socketIO.sockets.in(roomID).emit('join', user);
-					socketIO.sockets.in(roomID).emit('sys', user.name + ' has joined', room);
-					console.log(JSON.stringify(user) + ' joined' + roomID);
+					socketIO.sockets.in(roomName).emit('join', user);
+					socketIO.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
+					console.log(JSON.stringify(user) + ' joined' + roomName);
 				}
 			}
 		});
@@ -150,11 +158,11 @@ const COOLDOWN_TIME = 30; // in seconds
 				room.removeUser(user.name);
 			}
 
-			socket.leave(roomID);
+			socket.leave(roomName);
 			if(!user.anon){
-				socketIO.sockets.in(roomID).emit('leave', user);
-				//socketIO.sockets.in(roomID).emit('sys', user.name + ' has left', room);
-				console.log(JSON.stringify(user) + ' has left ' + roomID);
+				socketIO.sockets.in(roomName).emit('leave', user);
+				//socketIO.sockets.in(roomName).emit('sys', user.name + ' has left', room);
+				console.log(JSON.stringify(user) + ' has left ' + roomName);
 			}
 		});
 
@@ -169,10 +177,13 @@ const COOLDOWN_TIME = 30; // in seconds
 
 			room.bans.push(userToBan);
 			await cs.channelUserBan(room.id, userToBan);
-			if(user = room.getUserById(userToBan)){
-				socket.emit('sys', `${user.name} has been banned`);  
+			let u = room.getUserById(userToBan);
+			if(u){
+				socket.emit('sys', `${u.name} has been banned`);  
 				// Now do the thing
-				user.banned = true;
+				u.banned = true;
+			}else{
+				socket.emit('sys', `user has been banned`);  
 			}
 			return false;
 		});
@@ -186,10 +197,12 @@ const COOLDOWN_TIME = 30; // in seconds
 			}
 			rooms.bans = rooms.bans.slice(0, rooms.bans.indexOf(userToBan));
 			await cs.channelUserUnban(room.id, userToBan);
-			if(user = room.getUserById(userToBan)){
-				socket.emit('sys', `${user.name} has been unbanned`);
+			if(u){
+				socket.emit('sys', `${u.name} has been unbanned`);  
 				// Now do the thing
-				user.banned = false;
+				u.banned = false;
+			}else{
+				socket.emit('sys', `user has been unbanned`);  
 			}
 			return false;
 		});
@@ -205,20 +218,23 @@ const COOLDOWN_TIME = 30; // in seconds
 
 			room.timeouts[userToBan] = time > 0 ? (new Date).getTime() + time : time;
 			await cs.channelUserTimeout(room.id, userToBan, room.timeouts[userToBan]);
-			if(user = room.getUserById(userToBan)){
-				socket.emit('sys', `${user.name} has been timed out for ${time} seconds`);
+			let u = room.getUserById(userToBan);
+			if(u){
+				socket.emit('sys', `${u.name} has been timed out for ${time} seconds`);
 				// Now do the thing
-				user.timeout = room.timeouts[userToBan];
+				u.timeout = room.timeouts[userToBan];
+			}else{
+				socket.emit('sys', `user has been timed out for ${time} seconds`);	
 			}
 			return false;
 		});
 
 		socket.on('message', (msgs) => {
 			console.log('bab', room, user, msgs);
-			if(!room || !user){
+			if(!room){
 				return false;
 			}
-			if(!room.getUser(user.name) || user.anon){ 
+			if(!user || !room.getUser(user.name) || user.anon){ 
 				console.error({
 					statusCode: 403, 
 					message: 'USER_NOT_AUTHED'
@@ -228,20 +244,23 @@ const COOLDOWN_TIME = 30; // in seconds
 			}
 			let now = (new Date).getTime();
 			if(room.getUser(user.name)){
-				if(room.isUserBanned(user.name)){
-					socket.emit('sys', 'You are banned.');
-					return false;
-				}
-
-				if (room.isUserTimedout(user.name)) {
-					socket.emit('sys', `You are timed out.`);
-					return false;
-				}
-
-				if(room.getUser(user.name).lastMessage &&
-					(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000)){
-						socket.emit('sys', `You are typing too fast (${COOLDOWN_TIME} seconds).`);
+				// Ignore this if user is owner
+				if(typeof room.owner === 'undefined' || room.owner !== user.id){
+					if(room.isUserBanned(user.name, user.id)){
+						socket.emit('sys', 'You are banned.');
 						return false;
+					}
+
+					if (room.isUserTimedout(user.name)) {
+						socket.emit('sys', `You are timed out.`);
+						return false;
+					}
+
+					if(room.getUser(user.name).lastMessage &&
+						(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000)){
+							socket.emit('sys', `You are typing too fast (${COOLDOWN_TIME} seconds).`);
+							return false;
+					}
 				}
 			}
 			if(typeof msgs == 'object'){
@@ -277,7 +296,7 @@ const COOLDOWN_TIME = 30; // in seconds
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
-						socketIO.sockets.in(roomID).emit('msgs', user, msgs);
+						socketIO.sockets.in(roomName).emit('msgs', user, msgs);
 					}
 				});
 			}
