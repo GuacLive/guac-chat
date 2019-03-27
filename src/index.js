@@ -30,6 +30,8 @@ import redisAdapter from 'socket.io-redis';
 
 import linkifyUrls from 'linkify-urls';
 
+import Badge from './Badge';
+
 import Room from './Room';
 
 import User from './User';
@@ -106,6 +108,11 @@ const COOLDOWN_TIME = 30; // in seconds
 						user = room.getUser(authedUser.name);
 						if(room.bans.indexOf(user.id) >= 0){
 							user.banned = true;
+						}
+						if(user.id === room.owner){
+							user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster'));
+						}else if(room.privileged.indexOf(user.id) > -1){
+							user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator'));
 						}
 						return false;
 					}else{

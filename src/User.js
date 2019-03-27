@@ -7,11 +7,7 @@ class User {
 		this.lastMessage = null;
 		this.banned = false;
 		this.timeout = null;
-		this.privileges = [];
-	}
-
-	hasPrivilege(priv){
-		return this.privileges.contains(priv);
+		this.badges = new Map();
 	}
 }
 export default User;
