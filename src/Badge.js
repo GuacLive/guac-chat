@@ -1,9 +1,10 @@
+const MAX_SLOT = 2;
 class Badge {
     constructor(id, name, label, slot = 0){
         this.id = id;
         this.name = name;
         this.label = label;
-        if(slot <= 3) this.slot = slot;
+        this.slot = slot <= 2 ? slot : MAX_SLOT;
 	}
 }
 export default Badge;

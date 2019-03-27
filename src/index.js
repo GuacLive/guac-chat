@@ -109,11 +109,6 @@ const COOLDOWN_TIME = 30; // in seconds
 						if(room.bans.indexOf(user.id) >= 0){
 							user.banned = true;
 						}
-						if(user.id === room.owner){
-							user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster'));
-						}else if(room.privileged.indexOf(user.id) > -1){
-							user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator'));
-						}
 						return false;
 					}else{
 						user = new User(
@@ -125,6 +120,11 @@ const COOLDOWN_TIME = 30; // in seconds
 							user.banned = true;
 						}
 						//user.banned = authedUser.banned;
+					}
+					if(user.id === room.owner){
+						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster'));
+					}else if(room.privileged.indexOf(user.id) > -1){
+						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator'));
 					}
 				}else{
 					console.error(token, authedUser);
@@ -148,7 +148,7 @@ const COOLDOWN_TIME = 30; // in seconds
 				if(!user.anon){
 					socketIO.sockets.in(roomName).emit('join', user);
 					socketIO.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
-					console.log(JSON.stringify(user) + ' joined' + roomName);
+					console.log(user + ' joined' + roomName);
 				}
 			}
 		});
@@ -169,7 +169,7 @@ const COOLDOWN_TIME = 30; // in seconds
 			if(!user.anon){
 				socketIO.sockets.in(roomName).emit('leave', user);
 				//socketIO.sockets.in(roomName).emit('sys', user.name + ' has left', room);
-				console.log(JSON.stringify(user) + ' has left ' + roomName);
+				console.log(user + ' has left ' + roomName);
 			}
 		});
 
@@ -303,7 +303,7 @@ const COOLDOWN_TIME = 30; // in seconds
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
-						socketIO.sockets.in(roomName).emit('msgs', user, msgs);
+						socketIO.sockets.in(roomName).emit('msgs', user.toJSON(), msgs);
 					}
 				});
 			}
