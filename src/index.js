@@ -148,7 +148,7 @@ const COOLDOWN_TIME = 30; // in seconds
 				if(!user.anon){
 					socketIO.sockets.in(roomName).emit('join', user);
 					socketIO.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
-					console.log(user + ' joined' + roomName);
+					console.log(JSON.stringify(user) + ' joined' + roomName);
 				}
 			}
 		});
@@ -169,7 +169,7 @@ const COOLDOWN_TIME = 30; // in seconds
 			if(!user.anon){
 				socketIO.sockets.in(roomName).emit('leave', user);
 				//socketIO.sockets.in(roomName).emit('sys', user.name + ' has left', room);
-				console.log(user + ' has left ' + roomName);
+				console.log(JSON.stringify(user) + ' has left ' + roomName);
 			}
 		});
 
