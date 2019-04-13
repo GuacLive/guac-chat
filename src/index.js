@@ -316,33 +316,30 @@ const COOLDOWN_TIME = 30; // in seconds
 			}
 			if(typeof msgs == 'object'){
 				msgs.forEach((msg, i) => {
-					if(!msg.type){
-						return false;
-					}
-					if(!msg.content.trim()){
-						return;
-					}
-					switch(msg.type){
-						case 'text':
-							// todo: filter
-							msg.content = linkifyUrls(msg.content);
-							msg.content = msg.content.substring(0, 240);
-						break;
-						case 'emote':
-							/*if(!isGlobalEmote(msg.content)){
+					console.log('this is msg yes', msg, i);
+					if(msg && msg.content.trim()){	
+						switch(msg.type){
+							case 'text':
+								// todo: filter
+								msg.content = linkifyUrls(msg.content);
+								msg.content = msg.content.substring(0, 240);
+							break;
+							case 'emote':
+								/*if(!isGlobalEmote(msg.content)){
+									msg = null;
+								}else if(typeof room.emotes[msg.content] !== 'object'){
+									msg = null;
+								}*/
+							break;
+							default:
 								msg = null;
-							}else if(typeof room.emotes[msg.content] !== 'object'){
-								msg = null;
-							}*/
-						break;
-						default:
-							return false;
-						break;
-					}
-					if(msg === null){
-						delete msgs[i];
-					}else{
-						msgs[i] = msg;
+							break;
+						}
+						if(msg === null){
+							delete msgs[i];
+						}else{
+							msgs[i] = msg;
+						}
 					}
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
