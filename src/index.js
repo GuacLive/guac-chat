@@ -90,6 +90,8 @@ const COOLDOWN_TIME = 30; // in seconds
 				if(channelInfo && typeof channelInfo.id === 'number'){
 					room.owner = channelInfo.user.id;
 					room.id = channelInfo.id;
+					console.log('channelInfo', channelInfo.mods);
+					room.privileged = typeof channelInfo.mods === 'array' ? channelInfo.mods : [];
 					room.privileged.push(room.owner);
 					let channelBans = await cs.getChannelBans(room.id);
 					if(channelBans) room.bans = channelBans;
@@ -197,13 +199,14 @@ const COOLDOWN_TIME = 30; // in seconds
 
 		socket.on('unban', async (userToBan) => {
 			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
-			if(!room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
+			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
-			}else if(room.privileged.indexOf(userToBan) === -1){ // can't ban mods
+			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
 				return false;
 			}
-			rooms.bans = rooms.bans.slice(0, rooms.bans.indexOf(userToBan));
+			room.bans = room.bans.slice(0, room.bans.indexOf(userToBan));
 			await cs.channelUserUnban(room.id, userToBan);
+			let u = room.getUserById(userToBan);
 			if(u){
 				socket.emit('sys', `${u.name} has been unbanned`);  
 				// Now do the thing
@@ -216,7 +219,7 @@ const COOLDOWN_TIME = 30; // in seconds
 
 		socket.on('mod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
-			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
+			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
 			if(room.owner !== user.id){ // is this user not the owner?
 				return false;
 			}
@@ -224,12 +227,13 @@ const COOLDOWN_TIME = 30; // in seconds
 				return false;
 			}
 
-			room.privileged.push(userToMod);
 			await cs.channelUserMod(room.id, userToMod);
 			let u = room.getUserById(userToMod);
 			if(u){
 				socket.emit('sys', `${u.name} has been modded`);  
 				// Now do the thing
+				room.privileged.push(userToMod);
+				socket.emit('privileged', room.privileged);
 			}else{
 				socket.emit('sys', `user has been modded`);  
 			}
@@ -238,7 +242,7 @@ const COOLDOWN_TIME = 30; // in seconds
 
 		socket.on('unmod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
-			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
+			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
 			if(room.owner !== user.id && user.id !== userToMod){ // is this user not the owner AND NOT yourself?
 				return false;
 			}
@@ -246,12 +250,13 @@ const COOLDOWN_TIME = 30; // in seconds
 				return false;
 			}
 
-			room.privileged.splice(room.privileged.indexOf(userToMod));
 			await cs.channelUserUnmod(room.id, userToMod);
 			let u = room.getUserById(userToMod);
 			if(u){
 				socket.emit('sys', `${u.name} has been unmodded`);  
 				// Now do the thing
+				room.privileged.splice(room.privileged.indexOf(userToMod));
+				socket.emit('privileged', room.privileged);
 			}else{
 				socket.emit('sys', `user has been unmodded`);  
 			}
