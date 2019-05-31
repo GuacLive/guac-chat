@@ -28,8 +28,6 @@ import io from 'socket.io';
 
 import redisAdapter from 'socket.io-redis';
 
-import linkifyUrls from 'linkify-urls';
-
 import Badge from './Badge';
 
 import Room from './Room';
@@ -326,7 +324,6 @@ const COOLDOWN_TIME = 30; // in seconds
 						switch(msg.type){
 							case 'text':
 								// todo: filter
-								msg.content = linkifyUrls(msg.content);
 								msg.content = msg.content.substring(0, 240);
 							break;
 							case 'emote':
