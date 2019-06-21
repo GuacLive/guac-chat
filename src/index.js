@@ -92,7 +92,9 @@ const COOLDOWN_TIME = 30; // in seconds
 					room.privileged = typeof channelInfo.mods === 'array' ? channelInfo.mods : [];
 					room.privileged.push(room.owner);
 					let channelBans = await cs.getChannelBans(room.id);
+					let channelTimeouts = await cs.getChannelTimeouts(room.id);
 					if(channelBans) room.bans = channelBans;
+					if(channelTimeouts) room.timeouts = channelTimeouts;
 				}else{
 					console.error(roomName, channelInfo);
 					socket.emit('sys', 'Channel does not exist');

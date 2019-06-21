@@ -61,6 +61,39 @@ export default class ChannelService {
 		});
 	}
 
+	async getChannelTimeouts(channel) {
+		return await this.ApiService.callApi('/channel/timeouts', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			accessToken: process.env.API_SECRET,
+			body: JSON.stringify({
+				channel
+			})
+		})
+		.then(response => response.json())
+		.then(async (json) => {
+			if (!('statusCode' in json)) {
+				return Promise.reject(json);
+			}
+			if (json.statusCode !== 200) {
+				return Promise.reject(json);
+			}
+			let timeouts = [];
+			if(json && json.data){
+				await json.data.forEach(async (data) => {
+					if(timeouts[data.user_id] > -1) return;
+					timeouts.push(data.user_id);
+				})
+			}
+			return timeouts;
+		})
+		.catch(error => {
+			throw error;
+		});
+	}
+
 	async channelUserMod(channel, user, type = 'user_id') {
 		let json = {
 				channel
@@ -151,6 +184,35 @@ export default class ChannelService {
 		};
 		json[type] = user;
 		return await this.ApiService.callApi('/channel/userUnban', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			accessToken: process.env.API_SECRET,
+			body: JSON.stringify(json)
+		})
+		.then(response => response.json())
+		.then((json) => {
+			if (!('statusCode' in json)) {
+				return Promise.reject(json);
+			}
+			if (json.statusCode !== 200) {
+				return Promise.reject(json);
+			}
+			return json;
+		})
+		.catch(error => {
+			throw error;
+		});
+	}
+
+	async channelUserTimeout(channel, user, timeout = 0, type = 'user_id') {
+		let json = {
+				channel,
+				timeout
+		};
+		json[type] = user;
+		return await this.ApiService.callApi('/channel/userTimeout', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

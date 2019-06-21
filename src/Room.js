@@ -52,7 +52,7 @@ class Room {
 	isUserTimedout(name) {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
-		let user = this.timeouts.indexOf(normalized);
+		let user = this.timeouts.hasOwnProperty(normalized) && this.timeouts[normalized];
 		return (user && user.time >= (new Date).getTime());
 	}
 }
