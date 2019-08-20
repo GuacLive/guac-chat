@@ -1,5 +1,5 @@
 class User {
-	constructor(id, name, anon){
+	constructor(id, name, anon, type){
 		if(typeof id === 'number') this.id = id;
 		if(name) this.name = name;
 		this.anon = anon;
@@ -7,6 +7,7 @@ class User {
 		this.lastMessage = null;
 		this.banned = false;
 		this.timeout = null;
+		this.type = 'user';
 		this.badges = new Map();
 	}
 
@@ -19,7 +20,8 @@ class User {
 			heartbeat: this.heartbeat,
 			lastMessage: this.lastMessage,
 			banned: this.banned,
-			timeout: this.timeout
+			timeout: this.timeout,
+			type: this.type
 		};
 		cloned.badges = [...this.badges.values()];
 		return cloned;

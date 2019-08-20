@@ -116,7 +116,8 @@ const COOLDOWN_TIME = 30; // in seconds
 						user = new User(
 							authedUser.id,
 						  	authedUser.name,
-						  	false
+							false,
+							authedUser.type
 						);
 						if(room.bans.indexOf(authedUser.id) >= 0){
 							user.banned = true;
@@ -127,6 +128,14 @@ const COOLDOWN_TIME = 30; // in seconds
 						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster'));
 					}else if(room.privileged.indexOf(user.id) > -1){
 						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator'));
+					}
+					switch(user.type){
+						case 'staff':
+							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', 2));
+						break;
+						case 'admin':
+							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', 2));
+						break;
 					}
 				}else{
 					console.error(token, authedUser);
