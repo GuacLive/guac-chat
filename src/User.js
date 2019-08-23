@@ -7,7 +7,7 @@ class User {
 		this.lastMessage = null;
 		this.banned = false;
 		this.timeout = null;
-		this.type = type;
+		this.type = type || 'user';
 		this.badges = new Map();
 	}
 
