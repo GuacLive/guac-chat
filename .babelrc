@@ -11,6 +11,7 @@
 					"safari >= 7"
 				]
 			},
+			"corejs": "2",
 			"modules": "commonjs",
 			"useBuiltIns": "usage"
 		}]
