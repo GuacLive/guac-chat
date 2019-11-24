@@ -42,7 +42,7 @@ var rooms = [
 
 ];
 
-const COOLDOWN_TIME = 30; // in seconds
+const COOLDOWN_TIME = 10; // in seconds
 
 (() => {
 	const socketIO = io(nconf.get('server:port'));
@@ -229,7 +229,7 @@ const COOLDOWN_TIME = 30; // in seconds
 		socket.on('mod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
-			if(room.owner !== user.id){ // is this user not the owner?
+			if(room.owner !== user.id || user.type !== 'staff'){ // if this user is not the owner or not staff
 				return false;
 			}
 			if(room.privileged.indexOf(userToMod) !== -1){ // user is already a mod
