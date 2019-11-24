@@ -72,10 +72,15 @@ const COOLDOWN_TIME = 10; // in seconds
 				return;
 			}
 
-			socket.emit('viewers', 
-				Object.keys(socketIO.in(roomName).clients().connected)
-				&& Object.keys(socketIO.in(roomName).clients().connected).length
-			);
+			function emitViewers(){
+				socket.emit('viewers', 
+					Object.keys(socketIO.in(roomName).clients().connected)
+					&& Object.keys(socketIO.in(roomName).clients().connected).length
+				);
+			}
+			emitViewers();
+			// emit viewer count every 30 seconds
+			setTimeout(emitViewers.bind(this), 30 * 1000);
 
 			if(!room){
 				rooms[roomName] = room = new Room(
