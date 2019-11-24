@@ -94,7 +94,7 @@ const COOLDOWN_TIME = 10; // in seconds
 					room.owner = channelInfo.user.id;
 					room.id = channelInfo.id;
 					console.log('channelInfo', channelInfo.mods);
-					room.privileged = typeof channelInfo.mods === 'array' ? channelInfo.mods : [];
+					room.privileged = channelInfo.mods && Array.isArray(channelInfo.mods) ? channelInfo.mods : [];
 					room.privileged.push(room.owner);
 					let channelBans = await cs.getChannelBans(room.id);
 					let channelTimeouts = await cs.getChannelTimeouts(room.id);
