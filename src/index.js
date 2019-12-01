@@ -80,7 +80,7 @@ const COOLDOWN_TIME = 10; // in seconds
 			}
 			emitViewers();
 			// emit viewer count every 30 seconds
-			setTimeout(emitViewers.bind(this), 30 * 1000);
+			setInterval(emitViewers.bind(this), 30 * 1000);
 
 			if(!room){
 				rooms[roomName] = room = new Room(
