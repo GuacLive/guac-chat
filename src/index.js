@@ -45,7 +45,15 @@ var rooms = [
 const COOLDOWN_TIME = 10; // in seconds
 
 (() => {
-	const socketIO = io(nconf.get('server:port'));
+	const socketIO = io(
+		nconf.get('server:port'),
+		{
+		wsEngine: 'uws',
+		perMessageDeflate: {
+			threshold: 32768,
+			serverNoContextTakeover: false
+		}
+	});
 
 	socketIO.adapter(redisAdapter({
 		host: nconf.get('redis:connection:host'),
