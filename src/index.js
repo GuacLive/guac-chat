@@ -119,29 +119,47 @@ const COOLDOWN_TIME = 10; // in seconds
 				let authedUser = await us.tokenAuth(token);
 				console.log('authedUser', authedUser);
 				if(authedUser && typeof authedUser.id === 'number'){
+					// if user has been globally banned
+					if(authedUser.banned){
+						// Make them an anonymous user, so they still can read chat
+						user = new User(
+							false,
+							'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000,
+							true
+						);
+						user.banned = true;
+						socket.emit('sys', 'You are globally banned from Guac');  
+						return;	
+					}
+					// If user already exists in room
 					if(room.getUser(authedUser.name)){
 						user = room.getUser(authedUser.name);
+						// Check if banned from room
 						if(room.bans.indexOf(user.id) >= 0){
 							user.banned = true;
 						}
 						return false;
 					}else{
+						// Create new user with authed details
 						user = new User(
 							authedUser.id,
 						  	authedUser.name,
 							false,
 							authedUser.type
 						);
+						// Check if banned from room
 						if(room.bans.indexOf(authedUser.id) >= 0){
 							user.banned = true;
 						}
 						//user.banned = authedUser.banned;
 					}
+					// Room owner will always have broadcaster badge
 					if(user.id === room.owner){
 						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster'));
-					}else if(room.privileged.indexOf(user.id) > -1){
+					}else if(room.privileged.indexOf(user.id) > -1){ // Mods will always have mod badge
 						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator'));
 					}
+					// Other badge types
 					switch(user.type){
 						case 'staff':
 							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', 2));
