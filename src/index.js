@@ -42,7 +42,7 @@ var rooms = [
 
 ];
 
-const COOLDOWN_TIME = 10; // in seconds
+const COOLDOWN_TIME = 3; // in seconds
 
 (() => {
 	const socketIO = io(
