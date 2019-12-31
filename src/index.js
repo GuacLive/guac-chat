@@ -123,6 +123,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					return;
 				}
 			}
+			let showJoinMessage = true;
 			// Authenticate user
 			if(token){
 				let authedUser = await us.tokenAuth(token);
@@ -147,6 +148,7 @@ const COOLDOWN_TIME = 3; // in seconds
 						if(room.bans.indexOf(user.id) >= 0){
 							user.banned = true;
 						}
+						showJoinMessage = false;
 						return false;
 					}else{
 						// Create new user with authed details
@@ -198,7 +200,9 @@ const COOLDOWN_TIME = 3; // in seconds
 				socket.emit('users', [...room.users.values()]);
 				if(!user.anon){
 					socketIO.sockets.in(roomName).emit('join', user);
-					socketIO.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
+					if(showJoinMessage){
+						socketIO.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
+					}
 					console.log(JSON.stringify(user) + ' joined' + roomName);
 				}
 			}
