@@ -38,6 +38,15 @@ import UserService from './services/user';
 
 import ChannelService from './services/channel';
 
+import FlakeId from 'flake-idgen'
+import intformat from 'biguint-format'
+
+const flake = new FlakeId({
+    epoch: new Date(2018, 5, 16)
+})
+
+const generateFlake = () => intformat(flake.next(), 'dec')
+
 var rooms = [
 
 ];
@@ -215,6 +224,18 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 		});
 
+		socket.on('delete', async (msgID) => {
+			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
+			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
+				return false;
+			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
+				return false;
+			}
+
+			socket.emit('delete', msgID);  
+			return false;
+		});
+
 		socket.on('ban', async (userToBan) => {
 			console.log('spellspell', room.privileged, user.id, userToBan)
 			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
@@ -388,7 +409,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
-						socketIO.sockets.in(roomName).emit('msgs', user.toJSON(), msgs);
+						socketIO.sockets.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
 					}
 				});
 			}

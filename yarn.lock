@@ -810,6 +810,11 @@ better-assert@~1.0.0:
   dependencies:
     callsite "1.0.0"
 
+biguint-format@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/biguint-format/-/biguint-format-1.0.1.tgz#0ad9a81a48de96a79084c1a2fcc11bf27b80e284"
+  integrity sha512-EyEAXbBXdXHTmysr9bFjiTiFa7nDwew4N2qZ2Ka0aAM9oTidS5lNH3jVTBPFcaXyRCzLpw1cb3ATD+fzg89/fQ==
+
 blob@0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/blob/-/blob-0.0.5.tgz#d680eeef25f8cd91ad533f5b01eed48e64caf683"
@@ -1067,6 +1072,11 @@ find-up@^3.0.0:
   integrity sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg==
   dependencies:
     locate-path "^3.0.0"
+
+flake-idgen@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/flake-idgen/-/flake-idgen-1.1.2.tgz#ada07c42359a3bed0bbae3786810355202412b2c"
+  integrity sha512-VNhbzA/dUfWNn8Vko4iWRFonl8bdyNFkU11936KCsjyesa8ScDuYSr7LlC8XCAZ7TfEnhwpbDjPMOW+kvdZCnw==
 
 function-bind@^1.1.1:
   version "1.1.1"
