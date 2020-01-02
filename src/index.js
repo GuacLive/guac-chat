@@ -235,6 +235,7 @@ const COOLDOWN_TIME = 3; // in seconds
 				return false;
 			}
 
+			socket.emit('sys', `Message has been deleted`);  
 			socket.emit('delete', msgID);  
 			return false;
 		});
