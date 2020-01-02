@@ -83,9 +83,9 @@ export default class ChannelService {
 			let timeouts = new Map();
 			if(json && json.data){
 				await json.data.forEach(async (data) => {
-					if(timeouts.has(data.name])) return;
+					if(timeouts.has(data.name)) return;
 					timeouts.set(data.name, data.time);
-				})
+				});
 			}
 			return timeouts;
 		})
