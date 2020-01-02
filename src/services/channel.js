@@ -80,11 +80,11 @@ export default class ChannelService {
 			if (json.statusCode !== 200) {
 				return Promise.reject(json);
 			}
-			let timeouts = [];
+			let timeouts = new Map();
 			if(json && json.data){
 				await json.data.forEach(async (data) => {
-					if(timeouts[data.user_id] > -1) return;
-					timeouts.push(data.user_id);
+					if(timeouts.has(data.name])) return;
+					timeouts.set(data.name, data.time);
 				})
 			}
 			return timeouts;

@@ -117,10 +117,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					let channelTimeouts = await cs.getChannelTimeouts(room.id);
 					if(channelBans) room.bans = channelBans;
 					if(channelTimeouts){
-						room.timeouts = new Map(channelTimeouts.map((t) => {
-							console.log('t', t);
-							return [t.name, t.time];
-						}));
+						room.timeouts = channelTimeouts;
 					}
 				}else{
 					console.error(roomName, channelInfo);
