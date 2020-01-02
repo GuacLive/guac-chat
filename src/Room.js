@@ -5,7 +5,7 @@ class Room {
 		this.users = new Map();
 		this.privileged = [];
 		this.bans = [];
-		this.timeouts = [];
+		this.timeouts = new WeakMap();
 		this.emotes = {};
 		this.owner = null;
 	}
@@ -52,7 +52,7 @@ class Room {
 	isUserTimedout(name) {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
-		let user = this.timeouts.hasOwnProperty(normalized) && this.timeouts[normalized];
+		let user = this.timeouts.get(normalized);
 		return (user && user.time >= (new Date).getTime());
 	}
 }

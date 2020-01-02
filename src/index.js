@@ -236,7 +236,7 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 
 			socket.emit('sys', `Message has been deleted`);  
-			socket.emit('delete', msgID);  
+			socket.emit('delete', +msgID);  
 			return false;
 		});
 
@@ -337,15 +337,15 @@ const COOLDOWN_TIME = 3; // in seconds
 				return false;
 			}
 
-			room.timeouts[userToBan] = time > 0 ? (new Date).getTime() + time : time;
-			await cs.channelUserTimeout(room.id, userToBan, room.timeouts[userToBan]);
 			let u = room.getUserById(userToBan);
-			if(u){
+			if(u && u.name){
+				room.timeouts.set(u.name, time > 0 ? (new Date).getTime() + time : time);
+				await cs.channelUserTimeout(room.id, userToBan, room.timeouts.get(u.name));
 				socket.emit('sys', `${u.name} has been timed out for ${time} seconds`);
 				// Now do the thing
-				u.timeout = room.timeouts[userToBan];
+				u.timeout = room.timeouts.get(u.name);
 			}else{
-				socket.emit('sys', `user has been timed out for ${time} seconds`);	
+				socket.emit('sys', `Could not time out user`);	
 			}
 			return false;
 		});
