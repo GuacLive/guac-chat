@@ -5,7 +5,7 @@ class Room {
 		this.users = new Map();
 		this.privileged = [];
 		this.bans = [];
-		this.timeouts = new WeakMap();
+		this.timeouts = new Map();
 		this.emotes = {};
 		this.owner = null;
 	}
