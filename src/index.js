@@ -121,6 +121,7 @@ const COOLDOWN_TIME = 3; // in seconds
 							console.log('t', t);
 							return [t.name, t.time];
 						}));
+					}
 				}else{
 					console.error(roomName, channelInfo);
 					socket.emit('sys', 'Channel does not exist');
