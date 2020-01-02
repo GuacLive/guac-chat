@@ -228,7 +228,8 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 		});
 
-		socket.on('delete', async (msgID) => {
+		socket.on('delete', (msgID) => {
+			console.log('Inside delete', user, msgID);
 			if(typeof user !== 'object' || typeof msgID !== 'number') return false;
 			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
