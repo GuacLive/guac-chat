@@ -232,13 +232,13 @@ const COOLDOWN_TIME = 3; // in seconds
 
 		socket.on('delete', (msgID) => {
 			console.log('Inside delete', user, msgID);
-			if(typeof user !== 'object' || typeof msgID !== 'number') return false;
+			if(typeof user !== 'object' || typeof msgID !== 'string') return false;
 			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
 				return false;
 			}
 
 			socket.emit('sys', `Message has been deleted`);  
-			socket.emit('delete', BigInt(msgID));  
+			socketIO.sockets.in(roomName).emit('delete', msgID);  
 			return false;
 		});
 
