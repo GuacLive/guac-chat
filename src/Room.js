@@ -52,8 +52,9 @@ class Room {
 	isUserTimedout(name) {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
-		let user = this.timeouts.get(normalized);
-		return (user && user.timeout >= (new Date).getTime());
+		let user = this.getUser(normalized);
+		let timeout = this.timeouts.get(normalized);
+		return (user && timeout >= (new Date).getTime());
 	}
 }
 export default Room;
