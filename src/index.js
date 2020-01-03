@@ -341,7 +341,7 @@ const COOLDOWN_TIME = 3; // in seconds
 
 			let u = room.getUserById(userToBan);
 			if(u && u.name){
-				room.timeouts.set(u.name, time > 0 ? (new Date).getTime() + time : time);
+				room.timeouts.set(u.name, time > 0 ? (new Date).getTime() + (time * 1000) : time);
 				await cs.channelUserTimeout(room.id, userToBan, room.timeouts.get(u.name));
 				socket.emit('sys', `${u.name} has been timed out for ${time} seconds`);
 				// Now do the thing
