@@ -53,7 +53,7 @@ class Room {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
 		let user = this.timeouts.get(normalized);
-		return (user && user.time >= (new Date).getTime());
+		return (user && user.timeout >= (new Date).getTime());
 	}
 }
 export default Room;
