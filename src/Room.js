@@ -28,7 +28,7 @@ class Room {
 			if(data.length < 2) return;
 			if(data[1].id === id) return data[0].toLowerCase();
 		});
-		return username ? this.getUser(username[1]) : false;
+		return username ? this.getUser(username[0]) : false;
 	}
 
 	getUser(name){
