@@ -72,7 +72,27 @@ const COOLDOWN_TIME = 3; // in seconds
 
 	const us = new UserService(global.nconf.get('server:api_url'));
 	const cs = new ChannelService(global.nconf.get('server:api_url'));
-
+	function cleanupUsers(){
+		rooms.forEach((room, i) => {
+			if(room && room.users){
+				room.users.forEach((userVal, key) => {
+					if(userVal){
+						// If we haven't received a heartbeat in 900 seconds (15 minutes)
+						if(userVal.heartbeat <= (new Date).getTime() - (900 * 1000)){
+							// Remove user from list
+							room.users.delete(key);
+						}
+					}
+				});
+			}
+			// We are done purging user list, so restart the function in 60 seconds
+			if(rooms.length === i - 1){
+				setTimeout(cleanupUsers.bind(this), 60 * 1000);
+			}
+		});
+	}
+	// In 60 seconds, clean up users list
+	setTimeout(cleanupUsers.bind(this), 60 * 1000);
 	socketIO.on('connection', (socket) => {
 		var url = socket.request.headers.referer;
 		if(!url) return;
@@ -95,6 +115,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					&& Object.keys(socketIO.in(roomName).clients().connected).length
 				);
 			}
+			
 			emitViewers();
 			// emit viewer count every 30 seconds
 			setInterval(emitViewers.bind(this), 30 * 1000);
@@ -137,7 +158,9 @@ const COOLDOWN_TIME = 3; // in seconds
 						user = new User(
 							false,
 							'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000,
-							true
+							true,
+							'user',
+							socket.id
 						);
 						user.banned = true;
 						socket.emit('sys', 'You are globally banned from Guac');  
@@ -210,19 +233,39 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 		});
 
+		socket.on('ping', () => {
+			if(!room || !user){
+				return false;
+			}
+			var time = (new Date).getTime();
+			user.heartbeat = time;
+			if(user){
+				if(room.getUser(user.name)){
+					room.modifyUser(user);
+				}
+			}
+		});
+		  
 		socket.on('leave', () => {
 			socket.emit('disconnect');
 		});
 
 		socket.on('disconnect', () => {
-			if(!room || !user){
+			socket.leave(roomName);
+			if(!room){
+				// nothing
 				return false;
 			}
-			if(room.getUser(user.name)){
-				room.removeUser(user.name);
+			if(socket.id){
+				var u = room.getUserBySocketId(socket.id);
+				if(u) room.removeUser(u.name);
+			}
+			if(user){
+				if(room.getUser(user.name)){
+					room.removeUser(user.name);
+				}
 			}
 
-			socket.leave(roomName);
 			if(!user.anon){
 				socketIO.sockets.in(roomName).emit('leave', user);
 				//socketIO.sockets.in(roomName).emit('sys', user.name + ' has left', room);

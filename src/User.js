@@ -1,5 +1,5 @@
 class User {
-	constructor(id, name, anon, type){
+	constructor(id, name, anon, type, socketId){
 		if(typeof id === 'number') this.id = id;
 		if(name) this.name = name;
 		this.anon = anon;
@@ -8,6 +8,7 @@ class User {
 		this.banned = false;
 		this.timeout = null;
 		this.type = type || 'user';
+		if(typeof socketId === 'number') this.socketId = socketId;
 		this.badges = new Map();
 	}
 
@@ -21,7 +22,8 @@ class User {
 			lastMessage: this.lastMessage,
 			banned: this.banned,
 			timeout: this.timeout,
-			type: this.type
+			type: this.type,
+			socketId: this.socketId
 		};
 		cloned.badges = [...this.badges.values()];
 		return cloned;

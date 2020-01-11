@@ -20,6 +20,13 @@ class Room {
 		}
 		return user;
 	}
+	
+	modifyUser(args){
+		if(!args) return null;
+		const normalized = args.name.toLowerCase();
+		let user = this.users.get(normalized);
+		this.users.set(normalized, user);
+	}
 
 	getUserById(id){
 		if(typeof id !== 'number') return null;
@@ -27,6 +34,16 @@ class Room {
 		let username =  Array.from(this.users).map((data) => {
 			if(data.length < 2) return;
 			if(data[1].id === id) return data[0].toLowerCase();
+		});
+		return username ? this.getUser(username[0]) : false;
+	}
+
+	getUserBySocketId(socketId){
+		if(typeof socketId !== 'number') return null;
+		//const normalized = name.toLowerCase();
+		let username =  Array.from(this.users).map((data) => {
+			if(data.length < 2) return;
+			if(data[1].socketId === socketId) return data[0].toLowerCase();
 		});
 		return username ? this.getUser(username[0]) : false;
 	}
