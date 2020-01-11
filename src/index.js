@@ -111,7 +111,7 @@ const COOLDOWN_TIME = 3; // in seconds
 
 			function emitViewers(){
 				socketIO.in(roomName).clients((err, clients) => {
-					socket.emit('viewers', clients.length);
+					socket.emit('viewers', clients.length + 1);
 				});
 			}
 			
