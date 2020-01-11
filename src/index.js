@@ -111,8 +111,8 @@ const COOLDOWN_TIME = 3; // in seconds
 
 			function emitViewers(){
 				socket.emit('viewers', 
-					Object.keys(socketIO.in(roomName).clients().connected)
-					&& Object.keys(socketIO.in(roomName).clients().connected).length
+					Object.keys(socketIO.sockets.in(roomName).clients().connected)
+					&& Object.keys(socketIO.sockets.in(roomName).clients().connected).length
 				);
 			}
 			
@@ -181,7 +181,8 @@ const COOLDOWN_TIME = 3; // in seconds
 							authedUser.id,
 						  	authedUser.name,
 							false,
-							authedUser.type
+							authedUser.type,
+							socket.id
 						);
 						// Check if banned from room
 						if(room.bans.indexOf(authedUser.id) >= 0){
@@ -213,7 +214,9 @@ const COOLDOWN_TIME = 3; // in seconds
 				user = new User(
 					false,
 					'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000,
-					true
+					true,
+					'user',
+					socket.id
 				);
 			}
 
