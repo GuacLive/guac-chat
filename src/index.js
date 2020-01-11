@@ -260,18 +260,22 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 			if(socket.id){
 				var u = room.getUserBySocketId(socket.id);
-				if(u) room.removeUser(u.name);
+				if(u){
+					room.removeUser(u.name);
+					if(!u.anon){
+						socketIO.sockets.in(roomName).emit('leave', u);
+						console.log(JSON.stringify(u) + ' has left ' + roomName);
+					}
+				}
 			}
 			if(user){
 				if(room.getUser(user.name)){
 					room.removeUser(user.name);
+					if(!user.anon){
+						socketIO.sockets.in(roomName).emit('leave', user);
+						console.log(JSON.stringify(user) + ' has left ' + roomName);
+					}
 				}
-			}
-
-			if(!user.anon){
-				socketIO.sockets.in(roomName).emit('leave', user);
-				//socketIO.sockets.in(roomName).emit('sys', user.name + ' has left', room);
-				console.log(JSON.stringify(user) + ' has left ' + roomName);
 			}
 		});
 
