@@ -173,7 +173,6 @@ const COOLDOWN_TIME = 3; // in seconds
 							user.banned = true;
 						}
 						showJoinMessage = false;
-						return false;
 					}else{
 						// Create new user with authed details
 						user = new User(
@@ -411,7 +410,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					statusCode: 403, 
 					message: 'USER_NOT_AUTHED'
 				});
-				socket.emit('sys', 'User is not authenticated');  
+				socket.emit('sys', 'You are not logged in (if you are, trying refreshing chat)');  
 				return false;
 			}
 			let now = (new Date).getTime();
