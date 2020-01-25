@@ -103,7 +103,7 @@ const COOLDOWN_TIME = 3; // in seconds
 		let user = null;
 
 		socket.on('join', async (token) => {
-			if(typeof roomName !== 'string'){
+			if(!roomName || typeof roomName !== 'string'){
 				console.log(roomName, 'Invalid room type');
 				socket.emit('sys', 'Invalid room type');  
 				return;
@@ -142,6 +142,7 @@ const COOLDOWN_TIME = 3; // in seconds
 				}else{
 					console.error(roomName, channelInfo);
 					socket.emit('sys', 'Channel does not exist');
+					delete rooms[roomName];
 					return;
 				}
 			}
