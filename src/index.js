@@ -87,12 +87,12 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 			// We are done purging user list, so restart the function in 60 seconds
 			if(rooms.length === i - 1){
-				setTimeout(cleanupUsers.bind(this), 60 * 1000);
+				setTimeout(() => {cleanupUsers();}, 60 * 1000);
 			}
 		});
 	}
 	// In 60 seconds, clean up users list
-	setTimeout(cleanupUsers.bind(this), 60 * 1000);
+	setTimeout(() => {cleanupUsers();}, 60 * 1000);
 	socketIO.on('connection', (socket) => {
 		var url = socket.request.headers.referer;
 		if(!url) return;
