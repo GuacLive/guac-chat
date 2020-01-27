@@ -38,8 +38,10 @@ import UserService from './services/user';
 
 import ChannelService from './services/channel';
 
-import FlakeId from 'flake-idgen'
-import intformat from 'biguint-format'
+import FlakeId from 'flake-idgen';
+import intformat from 'biguint-format';
+
+import escapeHtml from 'escape-html';
 
 const flake = new FlakeId({
     epoch: new Date(2018, 5, 16)
@@ -439,6 +441,7 @@ const COOLDOWN_TIME = 3; // in seconds
 				msgs.forEach((msg, i) => {
 					console.log('this is msg yes', msg, i);
 					if(msg && msg.content.trim()){	
+						msg.content = escapeHtml(msg.content);
 						switch(msg.type){
 							case 'text':
 								// todo: filter
