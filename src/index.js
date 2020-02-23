@@ -183,7 +183,8 @@ const COOLDOWN_TIME = 3; // in seconds
 						  	authedUser.name,
 							false,
 							authedUser.type,
-							socket.id
+							socket.id,
+							authedUser.activated
 						);
 						// Check if banned from room
 						if(room.bans.indexOf(authedUser.id) >= 0){
@@ -418,6 +419,10 @@ const COOLDOWN_TIME = 3; // in seconds
 			}
 			let now = (new Date).getTime();
 			if(room.getUser(user.name)){
+				if(!user.activated){
+					socket.emit('sys', 'Your user account is not activated. Check your e-mail.');
+					return false;
+				}
 				// Ignore this if user is owner
 				if(typeof room.owner === 'undefined' || room.owner !== user.id){
 					if(room.isUserBanned(user.name, user.id)){
