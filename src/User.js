@@ -27,6 +27,7 @@ class User {
 			type: this.type,
 			socketId: this.socketId,
 			activated: this.activated,
+			color: this.color,
 		};
 		cloned.badges = [...this.badges.values()];
 		return cloned;
