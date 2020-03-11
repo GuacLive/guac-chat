@@ -1,5 +1,5 @@
 class User {
-	constructor(id, name, anon, type, socketId, activated){
+	constructor(id, name, anon, type, socketId, activated, color){
 		if(typeof id === 'number') this.id = id;
 		if(name) this.name = name;
 		this.anon = anon;
@@ -10,6 +10,7 @@ class User {
 		this.type = type || 'user';
 		if(typeof socketId === 'number') this.socketId = socketId;
 		this.activated = activated || 0;
+		this.color = color || null;
 		this.badges = new Map();
 	}
 

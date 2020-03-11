@@ -184,7 +184,8 @@ const COOLDOWN_TIME = 3; // in seconds
 							false,
 							authedUser.type,
 							socket.id,
-							authedUser.activated
+							authedUser.activated,
+							authedUser.color
 						);
 						// Check if banned from room
 						if(room.bans.indexOf(authedUser.id) >= 0){
