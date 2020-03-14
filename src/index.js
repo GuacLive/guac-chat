@@ -96,6 +96,7 @@ const COOLDOWN_TIME = 3; // in seconds
 	// In 60 seconds, clean up users list
 	setTimeout(() => {cleanupUsers();}, 60 * 1000);
 	socketIO.on('connection', (socket) => {
+		var roomName;
 		let room = null;
 		let user = null;
 
