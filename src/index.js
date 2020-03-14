@@ -174,7 +174,8 @@ const COOLDOWN_TIME = 3; // in seconds
 							socket.id
 						);
 						user.banned = true;
-						socket.emit('sys', 'You are globally banned from Guac');  
+						socket.emit('sys', 'You are globally banned from Guac');
+						socket.join(roomName);
 						return;	
 					}
 					// If user already exists in room
@@ -482,7 +483,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
-						socket.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
+						socketIO.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
 					}
 				});
 			}
