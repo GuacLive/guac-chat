@@ -101,10 +101,12 @@ const COOLDOWN_TIME = 3; // in seconds
 		var user = null;
 
 		// room name is second paramter for backwards compatability
-		socket.on('join', async (token, roomName) => {
+		socket.on('join', async (token, joinRoomName) => {
 			// backwards compatability (grab from referrer if roomname does not exist)
 			var url = socket.request.headers.referer;
-			if(url && !roomName){
+			if(joinRoomName){
+				roomName = joinRoomName;
+			}else if(url){
 				console.log(url);
 				var splited = url.split('/');
 				var referrerRoomName = splited[splited.length - 1];
