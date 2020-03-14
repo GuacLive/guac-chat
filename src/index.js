@@ -96,20 +96,28 @@ const COOLDOWN_TIME = 3; // in seconds
 	// In 60 seconds, clean up users list
 	setTimeout(() => {cleanupUsers();}, 60 * 1000);
 	socketIO.on('connection', (socket) => {
-		var url = socket.request.headers.referer;
-		if(!url) return;
-		console.log(url);
-		var splited = url.split('/');
-		var roomName = splited[splited.length - 1];
-		let room = rooms[roomName];
+		let room = null;
 		let user = null;
 
-		socket.on('join', async (token) => {
+		// room name is second paramter for backwards compatability
+		socket.on('join', async (token, roomName) => {
+			// backwards compatability (grab from referrer if roomname does not exist)
+			var url = socket.request.headers.referer;
+			if(url && !roomName){
+				console.log(url);
+				var splited = url.split('/');
+				var referrerRoomName = splited[splited.length - 1];
+				if(referrerRoomName){
+					roomName = referrerRoomName;
+				}
+			}
+			// If name is not provided in join or in referrer, tell user to room is invalid
 			if(!roomName || typeof roomName !== 'string'){
 				console.log(roomName, 'Invalid room type');
 				socket.emit('sys', 'Invalid room type');  
 				return;
 			}
+			let room = rooms[roomName];
 
 			function emitViewers(){
 				socketIO.in(roomName).clients((err, clients) => {
@@ -228,7 +236,7 @@ const COOLDOWN_TIME = 3; // in seconds
 				room.addUser(user);
 
 				socket.join(roomName);
-				socket.emit('users', [...room.users.values()]);
+				socket.to(roomName).emit('users', [...room.users.values()]);
 				if(!user.anon){
 					socketIO.sockets.in(roomName).emit('join', user);
 					if(showJoinMessage){
