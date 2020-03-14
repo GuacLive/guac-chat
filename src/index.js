@@ -97,8 +97,8 @@ const COOLDOWN_TIME = 3; // in seconds
 	setTimeout(() => {cleanupUsers();}, 60 * 1000);
 	socketIO.on('connection', (socket) => {
 		var roomName;
-		let room = null;
-		let user = null;
+		var room = null;
+		var user = null;
 
 		// room name is second paramter for backwards compatability
 		socket.on('join', async (token, roomName) => {
@@ -118,7 +118,7 @@ const COOLDOWN_TIME = 3; // in seconds
 				socket.emit('sys', 'Invalid room type');  
 				return;
 			}
-			let room = rooms[roomName];
+			room = rooms[roomName];
 
 			function emitViewers(){
 				socketIO.in(roomName).clients((err, clients) => {
