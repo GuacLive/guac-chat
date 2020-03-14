@@ -482,7 +482,7 @@ const COOLDOWN_TIME = 3; // in seconds
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
-						socketIO.sockets.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
+						socket.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
 					}
 				});
 			}
