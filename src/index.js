@@ -238,6 +238,7 @@ const COOLDOWN_TIME = 3; // in seconds
 			socket.emit('privileged', room.privileged);
 			if(room.users){
 				room.addUser(user);
+				socket.emit('me', user);
 
 				socket.join(roomName);
 				socket.to(roomName).emit('users', [...room.users.values()]);
