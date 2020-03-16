@@ -43,6 +43,10 @@ import intformat from 'biguint-format';
 
 import escapeHtml from 'escape-html';
 
+import {createServer} from 'http';
+import express from 'express';
+var cors = require('cors');
+
 const flake = new FlakeId({
     epoch: new Date(2018, 5, 16)
 })
@@ -54,10 +58,29 @@ var rooms = [
 ];
 
 const COOLDOWN_TIME = 3; // in seconds
+const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 (() => {
+	let _app = express();
+	_app.use(cors());
+	_app.use(express.json());
+	_app.options('*', cors());
+	_app.get('/messages/:room', async (req, res) => {
+		if(!USERNAME_REGEX.test(req.params.room)){
+			res.sendStatus(400);
+			return;
+		}
+		if(rooms && rooms[req.params.room]){
+			var room = rooms[req.params.room];
+			res.send(JSON.stringify(room.messages));
+		}
+		res.sendStatus(404);
+	});
+	let server = createServer(_app);
+	server.listen(nconf.get('server:port'));
+
 	const socketIO = io(
-		nconf.get('server:port'),
+		server,
 		{
 		wsEngine: 'uws',
 		perMessageDeflate: {
@@ -486,6 +509,11 @@ const COOLDOWN_TIME = 3; // in seconds
 					if(i == msgs.length - 1){
 						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
+						room.addMessage({
+							id: generateFlake(),
+							user: user.toJSON(),
+							msgs
+						});
 						socketIO.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
 					}
 				});

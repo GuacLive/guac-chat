@@ -7,7 +7,15 @@ class Room {
 		this.bans = [];
 		this.timeouts = new Map();
 		this.emotes = {};
+		this.messages = [];
 		this.owner = null;
+	}
+
+	addMessage(msg){
+		this.messages.push(msg);
+		if(this.messages && this.messages.length >= 250){
+            this.messages = this.messages.slice(-maxlines);
+		}
 	}
 
 	addUser(args){

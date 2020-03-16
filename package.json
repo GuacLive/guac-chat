@@ -28,8 +28,10 @@
   "dependencies": {
     "biguint-format": "^1.0.1",
     "core-js": "^3.5.0",
+    "cors": "^2.8.5",
     "cross-fetch": "^3.0.4",
     "escape-html": "^1.0.3",
+    "express": "^4.17.1",
     "flake-idgen": "^1.1.2",
     "jsonwebtoken": "^8.2.1",
     "linkify-urls": "^3.1.0-nolookbehind",
