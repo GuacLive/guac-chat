@@ -442,20 +442,12 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		});
 
 		socket.on('message', (msgs) => {
+			let now = (new Date).getTime();
 			console.log('bab', room, user, msgs);
 			if(!room){
 				return false;
 			}
-			if(!user || !room.getUser(user.name) || user.anon){ 
-				console.error({
-					statusCode: 403, 
-					message: 'USER_NOT_AUTHED'
-				});
-				socket.emit('sys', 'You are not logged in (if you are, trying refreshing chat)');  
-				return false;
-			}
-			let now = (new Date).getTime();
-			if(room.getUser(user.name)){
+			if(user && !user.anon){ 
 				if(!user.activated){
 					socket.emit('sys', 'Your user account is not activated. Check your e-mail.');
 					return false;
@@ -478,6 +470,14 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 							return false;
 					}
 				}
+			}else{
+				
+				console.error({
+					statusCode: 403, 
+					message: 'USER_NOT_AUTHED'
+				});
+				socket.emit('sys', 'You are not logged in (if you are, trying refreshing chat)');  
+				return false;
 			}
 			if(typeof msgs == 'object'){
 				msgs.forEach((msg, i) => {
