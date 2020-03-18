@@ -466,7 +466,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						return false;
 					}
 
-					if(room.getUser(user.name).lastMessage &&
+					if(room.getUser(user.name) && room.getUser(user.name).lastMessage &&
 						(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000)){
 							socket.emit('sys', `You are typing too fast (${COOLDOWN_TIME} seconds).`);
 							return false;
