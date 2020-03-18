@@ -73,8 +73,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		if(rooms && rooms[req.params.room]){
 			var room = rooms[req.params.room];
 			res.send(JSON.stringify(room.messages));
+		}else{
+			res.send(JSON.stringify([]));
 		}
-		res.sendStatus(404);
 	});
 	let server = createServer(_app);
 	server.listen(nconf.get('server:port'));
