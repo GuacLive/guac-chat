@@ -509,14 +509,15 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						}
 					}
 					if(i == msgs.length - 1){
+						var msgID = generateFlake();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
 						room.addMessage({
-							id: generateFlake(),
+							id: msgID,
 							time: (new Date).getTime(),
 							user: user.toJSON(),
 							msgs
 						});
-						socketIO.in(roomName).emit('msgs', user.toJSON(), generateFlake(), msgs);
+						socketIO.in(roomName).emit('msgs', user.toJSON(), msgID, msgs);
 					}
 				});
 			}
