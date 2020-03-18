@@ -507,10 +507,10 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						}
 					}
 					if(i == msgs.length - 1){
-						msgs.time = (new Date).getTime();
 						room.getUser(user.name).lastMessage = (new Date).getTime();
 						room.addMessage({
 							id: generateFlake(),
+							time: (new Date).getTime(),
 							user: user.toJSON(),
 							msgs
 						});
