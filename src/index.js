@@ -510,7 +510,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					}
 					if(i == msgs.length - 1){
 						var msgID = generateFlake();
-						room.getUser(user.name).lastMessage = (new Date).getTime();
+						if(room.getUser(user.name)){
+							room.getUser(user.name).lastMessage = (new Date).getTime();
+						}
 						room.addMessage({
 							id: msgID,
 							time: (new Date).getTime(),
