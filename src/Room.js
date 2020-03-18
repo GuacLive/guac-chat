@@ -75,13 +75,14 @@ class Room {
 	isUserBanned(name, id){
 		if(!name || typeof id !== 'number') return null;
 		const normalized = name.toLowerCase();
-		return this.bans.indexOf(id) >= 0 || this.users.get(normalized).banned;
+		return this.bans.indexOf(id) >= 0 || (this.users.get(normalized) && this.users.get(normalized).banned);
 	}
 
 	isUserTimedout(name) {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
 		let user = this.getUser(normalized);
+		if(!user) return null;
 		let timeout = this.timeouts.get(normalized);
 		let isTimedOut = user.timeout >= (new Date).getTime()
 			|| timeout >= (new Date).getTime();
