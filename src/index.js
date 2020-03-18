@@ -328,6 +328,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}
 
 			socket.emit('sys', `Message has been deleted`);  
+			room.removeMessage(msgID);
 			socketIO.sockets.in(roomName).emit('delete', msgID);  
 			return false;
 		});

@@ -18,6 +18,10 @@ class Room {
 		}
 	}
 
+	removeMessage(id){
+		this.messages = this.messages.filter((msg) => msg.id !== id);
+	}
+
 	addUser(args){
 		if(!args) return null;
 		const normalized = args.name.toLowerCase();
