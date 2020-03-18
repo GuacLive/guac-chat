@@ -265,7 +265,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				socket.emit('me', user);
 
 				socket.join(roomName);
-				socket.in(roomName).emit('users', [...room.users.values()]);
+				socketIO.sockets.in(roomName).emit('users', [...room.users.values()]);
 				if(!user.anon){
 					socketIO.sockets.in(roomName).emit('join', user);
 					if(showJoinMessage){
