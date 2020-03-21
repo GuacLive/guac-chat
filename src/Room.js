@@ -14,7 +14,7 @@ class Room {
 	addMessage(msg){
 		this.messages.push(msg);
 		if(this.messages && this.messages.length >= 250){
-            this.messages = this.messages.slice(-maxlines);
+            this.messages = this.messages.slice(-250);
 		}
 	}
 
