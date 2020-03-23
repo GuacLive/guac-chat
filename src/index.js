@@ -57,6 +57,7 @@ var rooms = [
 
 ];
 
+const SHOW_JOIN_MESSAGE = false;
 const COOLDOWN_TIME = 3; // in seconds
 const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
@@ -183,7 +184,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					return;
 				}
 			}
-			let showJoinMessage = true;
+			let showJoinMessage = SHOW_JOIN_MESSAGE;
 			// Authenticate user
 			if(token){
 				let authedUser = await us.tokenAuth(token);
