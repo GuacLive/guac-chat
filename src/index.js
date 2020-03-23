@@ -210,6 +210,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						// Check if banned from room
 						if(room.bans.indexOf(user.id) >= 0){
 							user.banned = true;
+							showJoinMessage = false;
 						}
 						showJoinMessage = false;
 					}else{
@@ -226,6 +227,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						// Check if banned from room
 						if(room.bans.indexOf(authedUser.id) >= 0){
 							user.banned = true;
+							showJoinMessage = false;
 						}
 						//user.banned = authedUser.banned;
 					}
