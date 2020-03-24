@@ -107,7 +107,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						// If we haven't received a heartbeat in 900 seconds (15 minutes)
 						if(userVal.heartbeat <= (new Date).getTime() - (900 * 1000)){
 							// Remove user from list
-							room.users.delete(key);
+							room.users.delete(userVal.name || key);
 						}
 					}
 				});
