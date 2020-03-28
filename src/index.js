@@ -513,12 +513,16 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					}
 					if(i == msgs.length - 1){
 						var msgID = generateFlake();
+						var lastMessage = (new Date).getTime();
+						// Set lastMessage on user
+						user.lastMessage = lastMessage;
 						if(room.getUser(user.name)){
-							room.getUser(user.name).lastMessage = (new Date).getTime();
+							// Update user in rooms object
+							room.modifyUser(user);
 						}
 						room.addMessage({
 							id: msgID,
-							time: (new Date).getTime(),
+							time: lastMessage,
 							user: user.toJSON(),
 							msgs
 						});
