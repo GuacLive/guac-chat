@@ -286,9 +286,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			var time = (new Date).getTime();
 			user.heartbeat = time;
 			if(user){
-				if(room.getUser(user.name)){
-					room.modifyUser(user);
-				}
+				room.modifyUser(user);
 			}
 		});
 		  
