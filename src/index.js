@@ -73,7 +73,8 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		}
 		if(rooms && rooms[req.params.room]){
 			var room = rooms[req.params.room];
-			res.send(JSON.stringify(room.messages));
+			// Serve 50 latest messages
+			res.send(JSON.stringify(room.messages.slice(-50)));
 		}else{
 			res.send(JSON.stringify([]));
 		}
@@ -514,7 +515,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						var lastMessage = (new Date).getTime();
 						// Set lastMessage on user
 						user.lastMessage = lastMessage;
-						if(room.getUser(user.name)){
+						if(user){
 							// Update user in rooms object
 							room.modifyUser(user);
 						}

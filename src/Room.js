@@ -1,3 +1,4 @@
+const MAX_LINES = 100;
 class Room {
 	constructor(id, name){
 		this.id = id;
@@ -13,8 +14,8 @@ class Room {
 
 	addMessage(msg){
 		this.messages.push(msg);
-		if(this.messages && this.messages.length >= 250){
-            this.messages = this.messages.slice(-250);
+		if(this.messages && this.messages.length >= MAX_LINES){
+            this.messages = this.messages.slice(-MAX_LINES);
 		}
 	}
 
