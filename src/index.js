@@ -280,14 +280,18 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}
 		});
 
-		socket.on('ping', () => {
-			if(!room || !user){
-				return false;
-			}
-			var time = (new Date).getTime();
-			user.heartbeat = time;
-			if(user){
-				room.modifyUser(user);
+
+		socket.conn.on('packet', (packet) => {
+			console.log('received', packet.type, 'packet from user', user.name);
+			if(packet.type === 'ping'){
+				if(!room || !user){
+					return false;
+				}
+				var time = (new Date).getTime();
+				user.heartbeat = time;
+				if(user){
+					room.modifyUser(user);
+				}
 			}
 		});
 		  
