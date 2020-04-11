@@ -282,7 +282,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 
 		socket.conn.on('packet', (packet) => {
-			console.log('received', packet.type, 'packet from user', user.name);
+			console.log('received', packet.type);
 			if(packet.type === 'ping'){
 				if(!room || !user){
 					return false;
