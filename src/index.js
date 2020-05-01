@@ -52,7 +52,14 @@ const flake = new FlakeId({
 })
 
 const generateFlake = () => intformat(flake.next(), 'dec')
-
+function truncate(str, n, useWordBoundary) {
+	if(str.length <= n){return str;}
+	const subString = str.substr(0, n - 1); // the original check
+	return (useWordBoundary
+		? subString.substr(0, subString.lastIndexOf(' '))
+		: subString) + "&hellip;";
+};
+  
 var rooms = [
 
 ];
@@ -490,12 +497,12 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			if(typeof msgs == 'object'){
 				msgs.forEach((msg, i) => {
 					console.log('this is msg yes', msg, i);
-					if(msg && msg.content.trim()){	
+					if(msg && msg.content){	
 						msg.content = escapeHtml(msg.content);
+						msg.content = truncate(msg.content.trim(), 240);
 						switch(msg.type){
 							case 'text':
 								// todo: filter
-								msg.content = msg.content.substring(0, 240);
 							break;
 							case 'emote':
 								/*if(!isGlobalEmote(msg.content)){
