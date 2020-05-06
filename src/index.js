@@ -144,7 +144,8 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		});
 
 		// room name is second paramter for backwards compatability
-		socket.on('join', async (token, roomName) => {
+		socket.on('join', async (token, joinRoomName) => {
+			roomName = joinRoomName;
 			// If name is not provided in join or in referrer, tell user to room is invalid
 			if(!roomName || typeof roomName !== 'string'){
 				console.log(roomName, 'Invalid room type');
@@ -261,7 +262,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}else{
 				user = new User(
 					false,
-					'User' + getRandomId(),
+					'User' + genRandomId(),
 					true,
 					'user',
 					socket.id
