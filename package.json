@@ -33,6 +33,7 @@
     "escape-html": "^1.0.3",
     "express": "^4.17.1",
     "flake-idgen": "^1.1.2",
+    "flood-protection": "^1.0.1",
     "jsonwebtoken": "^8.2.1",
     "linkify-urls": "^3.1.0-nolookbehind",
     "nconf": "^0.10.0",

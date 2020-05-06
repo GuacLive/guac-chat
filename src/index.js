@@ -41,6 +41,8 @@ import ChannelService from './services/channel';
 import FlakeId from 'flake-idgen';
 import intformat from 'biguint-format';
 
+import FloodProtection from 'flood-protection';
+
 import escapeHtml from 'escape-html';
 
 import {createServer} from 'http';
@@ -51,21 +53,21 @@ const flake = new FlakeId({
     epoch: new Date(2018, 5, 16)
 })
 
-const generateFlake = () => intformat(flake.next(), 'dec')
-function truncate(str, n, useWordBoundary) {
+const generateFlake = () => intformat(flake.next(), 'dec');
+const truncate = (str, n, useWordBoundary) => {
 	if(str.length <= n){return str;}
 	const subString = str.substr(0, n - 1); // the original check
 	return (useWordBoundary
 		? subString.substr(0, subString.lastIndexOf(' '))
 		: subString) + "&hellip;";
-};
-  
+}
+const genRandomId = () => Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+
 var rooms = [
 
 ];
 
 const SHOW_JOIN_MESSAGE = false;
-const COOLDOWN_TIME = 3; // in seconds
 const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 (() => {
@@ -132,21 +134,17 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		var roomName;
 		var room = null;
 		var user = null;
+		var floodProtection = new FloodProtection({
+			rate: 5,
+			// default: 5, unit: messages
+			// IMPORTANT: rate must be >= 1 (greater than or equal to 1)
+
+			per: 8,
+			// default: 8, unit: seconds
+		});
 
 		// room name is second paramter for backwards compatability
-		socket.on('join', async (token, joinRoomName) => {
-			// backwards compatability (grab from referrer if roomname does not exist)
-			var url = socket.request.headers.referer;
-			if(joinRoomName){
-				roomName = joinRoomName;
-			}else if(url){
-				console.log(url);
-				var splited = url.split('/');
-				var referrerRoomName = splited[splited.length - 1];
-				if(referrerRoomName){
-					roomName = referrerRoomName;
-				}
-			}
+		socket.on('join', async (token, roomName) => {
 			// If name is not provided in join or in referrer, tell user to room is invalid
 			if(!roomName || typeof roomName !== 'string'){
 				console.log(roomName, 'Invalid room type');
@@ -203,7 +201,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						// Make them an anonymous user, so they still can read chat
 						user = new User(
 							false,
-							'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000,
+							'User' + genRandomId(),
 							true,
 							'user',
 							socket.id
@@ -263,7 +261,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}else{
 				user = new User(
 					false,
-					'User' + Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000,
+					'User' + getRandomId(),
 					true,
 					'user',
 					socket.id
@@ -457,7 +455,6 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		});
 
 		socket.on('message', (msgs) => {
-			let now = (new Date).getTime();
 			console.log('bab', room, user, msgs);
 			if(!room){
 				return false;
@@ -479,14 +476,12 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						return false;
 					}
 
-					if(room.getUser(user.name) && room.getUser(user.name).lastMessage &&
-						(now - room.getUser(user.name).lastMessage) <= (COOLDOWN_TIME * 1000)){
-							socket.emit('sys', `You are typing too fast (${COOLDOWN_TIME} seconds).`);
-							return false;
+					if(floodProtection.check()){
+						socket.emit('sys', `You are typing too fast.`);
+						return false;
 					}
 				}
 			}else{
-				
 				console.error({
 					statusCode: 403, 
 					message: 'USER_NOT_AUTHED'
