@@ -492,10 +492,10 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}
 			if(typeof msgs == 'object'){
 				msgs.forEach((msg, i) => {
-					console.log('this is msg yes', msg, i);
 					if(msg && msg.content){	
 						msg.content = escapeHtml(msg.content);
 						msg.content = truncate(msg.content.trim(), 240);
+						console.log('this is msg yes', msg, i);
 						switch(msg.type){
 							case 'text':
 								// todo: filter
