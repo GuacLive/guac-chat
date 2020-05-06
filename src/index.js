@@ -476,7 +476,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						return false;
 					}
 
-					if(floodProtection.check()){
+					if(!floodProtection.check()){
 						socket.emit('sys', `You are typing too fast.`);
 						return false;
 					}
