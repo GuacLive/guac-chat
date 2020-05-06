@@ -316,7 +316,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					room.removeUser(u.name);
 					if(!u.anon){
 						socketIO.sockets.in(roomName).emit('leave', u);
-						console.log(JSON.stringify(u) + ' has left ' + roomName);
+						console.log(JSON.stringify(u) + ' has left ' + room.name || roomName);
 					}
 				}
 			}
@@ -325,7 +325,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					room.removeUser(user.name);
 					if(!user.anon){
 						socketIO.sockets.in(roomName).emit('leave', user);
-						console.log(JSON.stringify(user) + ' has left ' + roomName);
+						console.log(JSON.stringify(user) + ' has left ' + room.name || roomName);
 					}
 				}
 			}
