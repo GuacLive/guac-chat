@@ -139,7 +139,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			// default: 5, unit: messages
 			// IMPORTANT: rate must be >= 1 (greater than or equal to 1)
 
-			per: 8,
+			per: 10,
 			// default: 8, unit: seconds
 		});
 
@@ -476,11 +476,6 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						socket.emit('sys', `You are timed out.`);
 						return false;
 					}
-
-					if(!floodProtection.check()){
-						socket.emit('sys', `You are typing too fast.`);
-						return false;
-					}
 				}
 			}else{
 				console.error({
@@ -490,51 +485,61 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				socket.emit('sys', 'You are not logged in (if you are, trying refreshing chat)');  
 				return false;
 			}
-			if(typeof msgs == 'object'){
-				msgs.forEach((msg, i) => {
-					if(msg && msg.content){	
-						msg.content = escapeHtml(msg.content);
-						msg.content = truncate(msg.content.trim(), 240);
-						console.log('this is msg yes', msg, i);
-						switch(msg.type){
-							case 'text':
-								// todo: filter
-							break;
-							case 'emote':
-								/*if(!isGlobalEmote(msg.content)){
+
+			if(floodProtection.check()){
+				if(typeof msgs == 'object'){
+					msgs.forEach((msg, i) => {
+						// If message has content
+						if(msg && msg.content){	
+							msg.content = escapeHtml(msg.content);
+							msg.content = truncate(msg.content.trim(), 240);
+							console.log('this is msg yes', msg, i);
+							switch(msg.type){
+								case 'text':
+									// todo: filter
+								break;
+								case 'emote':
+									/*if(!isGlobalEmote(msg.content)){
+										msg = null;
+									}else if(typeof room.emotes[msg.content] !== 'object'){
+										msg = null;
+									}*/
+								break;
+								default:
 									msg = null;
-								}else if(typeof room.emotes[msg.content] !== 'object'){
-									msg = null;
-								}*/
-							break;
-							default:
-								msg = null;
-							break;
-						}
-						if(msg === null){
-							delete msgs[i];
+								break;
+							}
+							if(msg === null){
+								delete msgs[i];
+							}else{
+								msgs[i] = msg;
+							}
 						}else{
-							msgs[i] = msg;
+							// If empty message
+							delete msgs[i];
 						}
-					}
-					if(i == msgs.length - 1){
-						var msgID = generateFlake();
-						var lastMessage = (new Date).getTime();
-						// Set lastMessage on user
-						user.lastMessage = lastMessage;
-						if(user){
-							// Update user in rooms object
-							room.modifyUser(user);
+						// If at last msg
+						if(i == msgs.length - 1 && msgs.length > 0){
+							var msgID = generateFlake();
+							var lastMessage = (new Date).getTime();
+							// Set lastMessage on user
+							user.lastMessage = lastMessage;
+							if(user){
+								// Update user in rooms object
+								room.modifyUser(user);
+							}
+							room.addMessage({
+								id: msgID,
+								time: lastMessage,
+								user: user.toJSON(),
+								msgs
+							});
+							socketIO.in(roomName).emit('msgs', user.toJSON(), msgID, msgs);
 						}
-						room.addMessage({
-							id: msgID,
-							time: lastMessage,
-							user: user.toJSON(),
-							msgs
-						});
-						socketIO.in(roomName).emit('msgs', user.toJSON(), msgID, msgs);
-					}
-				});
+					});
+				}
+			}else{
+				socket.emit('sys', `You are typing too fast.`);
 			}
 		});
 	});
