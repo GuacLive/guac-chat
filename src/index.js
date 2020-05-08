@@ -135,11 +135,11 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		var room = null;
 		var user = null;
 		var floodProtection = new FloodProtection({
-			rate: 5,
+			rate: 4,
 			// default: 5, unit: messages
 			// IMPORTANT: rate must be >= 1 (greater than or equal to 1)
 
-			per: 10,
+			per: 8,
 			// default: 8, unit: seconds
 		});
 
