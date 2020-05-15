@@ -230,7 +230,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 							authedUser.type,
 							socket.id,
 							authedUser.activated,
-							authedUser.color
+							// If user has linked patreon OR has color, they are a patron
+							(authedUser.patreon && authedUser.patreon.isPatron) || authedUser.color,
+							authedUser.color,
 						);
 						// Check if banned from room
 						if(room.bans.indexOf(authedUser.id) >= 0){

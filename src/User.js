@@ -1,5 +1,5 @@
 class User {
-	constructor(id, name, anon, type, socketId, activated, color){
+	constructor(id, name, anon, type, socketId, activated, isPatron, color){
 		if(typeof id === 'number') this.id = id;
 		if(name) this.name = name;
 		this.anon = anon;
@@ -10,6 +10,7 @@ class User {
 		this.type = type || 'user';
 		if(typeof socketId === 'number') this.socketId = socketId;
 		this.activated = activated || 0;
+		this.isPatron = !!isPatron;
 		this.color = color || null;
 		this.badges = new Map();
 	}
@@ -27,6 +28,7 @@ class User {
 			type: this.type,
 			socketId: this.socketId,
 			activated: this.activated,
+			isPatreon: this.isPatron,
 			color: this.color,
 		};
 		cloned.badges = [...this.badges.values()];
