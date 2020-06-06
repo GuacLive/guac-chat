@@ -350,9 +350,15 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.on('ban', async (userToBan) => {
 			console.log('spellspell', room.privileged, user.id, userToBan)
 			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
-			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
-				return false;
-			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
+			// Staff can ban anyone
+			if(user.type !== 'staff'){
+				if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
+					return false;
+				}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
+					return false;
+				}
+			}else if(room.owner == userToBan){ // can't ban room owner even if admin
+				socket.emit('sys', `Room owner can not be banned`);  
 				return false;
 			}
 
@@ -371,9 +377,15 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 		socket.on('unban', async (userToBan) => {
 			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
-			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
-				return false;
-			}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
+			// Staff can ban anyone
+			if(user.type !== 'staff'){
+				if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
+					return false;
+				}else if(room.privileged.indexOf(userToBan) !== -1){ // can't ban mods
+					return false;
+				}
+			}else if(room.owner == userToBan){ // can't ban room owner even if admin
+				socket.emit('sys', `Room owner can not be banned`);  
 				return false;
 			}
 			room.bans = room.bans.slice(0, room.bans.indexOf(userToBan));
@@ -415,7 +427,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.on('unmod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
-			if(room.owner !== user.id && user.id !== userToMod){ // is this user not the owner AND NOT yourself?
+			if(room.owner !== user.id && user.id !== userToMod && user.type !== 'staff'){ // is this user not the owner AND NOT yourself AND NOT staff?
 				return false;
 			}
 			if(room.privileged.indexOf(userToMod) == -1){ // user is not a mod
