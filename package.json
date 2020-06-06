@@ -40,6 +40,6 @@
     "regenerator-runtime": "^0.13.1",
     "socket.io": "^2.1.1",
     "socket.io-redis": "^5.2.0",
-    "uws": "mmdevries/uws#2.9.4"
+    "uws": "mmdevries/uws#2.9.12"
   }
 }
