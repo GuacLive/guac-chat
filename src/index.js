@@ -1,5 +1,6 @@
 import path from 'path';
 import nconf from 'nconf';
+import pkg from '../package.json';
 
 const ENV = process.env.NODE_ENV || 'production';
 
@@ -142,6 +143,8 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			per: 8,
 			// default: 8, unit: seconds
 		});
+
+		socket.emit('version', pkg.version);
 
 		// room name is second paramter for backwards compatability
 		socket.on('join', async (token, joinRoomName) => {
