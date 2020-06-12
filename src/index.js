@@ -246,9 +246,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					}
 					// Room owner will always have broadcaster badge
 					if(user.id === room.owner){
-						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster'));
+						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', 0));
 					}else if(room.privileged.indexOf(user.id) > -1){ // Mods will always have mod badge
-						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator'));
+						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', 0));
 					}
 					// Other badge types
 					switch(user.type){
