@@ -507,7 +507,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				if(typeof msgs == 'object'){
 					try{
 						// NEW content length check
-						if(msgs.map((msg) => msg.content).join(' ').length > 240){
+						if(msgs.map((msg) => msg && msg.type === 'text' ? msg.content : '').join(' ').length > 240){
 							socket.emit('sys', 'Your message is too long.');  
 							return false;
 						}
