@@ -505,10 +505,18 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 			if(floodProtection.check()){
 				if(typeof msgs == 'object'){
+					try{
+						// NEW content length check
+						if(msgs.map((msg) => msg.content).join(' ').length > 240){
+							socket.emit('sys', 'Your message is too long.');  
+							return false;
+						}
+					}catch{}
 					msgs.forEach((msg, i) => {
 						// If message has content
 						if(msg && msg.content){	
 							msg.content = escapeHtml(msg.content);
+							// This is kinda useless as it is per-word
 							msg.content = truncate(msg.content.trim(), 240);
 							console.log('this is msg yes', msg, i);
 							switch(msg.type){
