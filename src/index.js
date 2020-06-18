@@ -93,14 +93,14 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 	server.listen(nconf.get('server:port'));
 
 	const socketIO = io(
-		server,
+		server, 
 		{
-		wsEngine: 'uws',
-		perMessageDeflate: {
-			threshold: 32768,
-			serverNoContextTakeover: false
+			wsEngine: 'eiows',
+			perMessageDeflate: {
+				threshold: 32768
+			}
 		}
-	});
+	);
 
 	socketIO.adapter(redisAdapter({
 		host: nconf.get('redis:connection:host'),
