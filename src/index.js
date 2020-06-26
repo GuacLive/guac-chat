@@ -185,6 +185,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				if(channelInfo && typeof channelInfo.id === 'number'){
 					room.owner = channelInfo.user.id;
 					room.id = channelInfo.id;
+					room.subEnabled = channelInfo.subEnabled;
 					console.log('channelInfo', channelInfo.mods);
 					room.privileged = channelInfo.mods && Array.isArray(channelInfo.mods) ? channelInfo.mods : [];
 					room.privileged.push(room.owner);
@@ -226,7 +227,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						return;	
 					}
 					// If channel subscriptions are enabled, check if user is a subscriber
-					if(channelInfo.subEnabled){
+					if(room.subEnabled){
 						for(const sub of subscriptions){
 							if(sub && sub.channel_stream_id === room.id){
 								subscriber = true;
