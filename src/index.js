@@ -63,6 +63,13 @@ const truncate = (str, n, useWordBoundary) => {
 		: subString) + "&hellip;";
 }
 const genRandomId = () => Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+function monthDiff(d1, d2){
+	var months;
+	months = (d2.getFullYear() - d1.getFullYear()) * 12;
+	months -= d1.getMonth();
+	months += d2.getMonth();
+	return months <= 0 ? 0 : months;
+}
 
 var rooms = [
 
@@ -200,6 +207,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				let authedUser = await us.tokenAuth(token);
 				console.log('authedUser', authedUser);
 				if(authedUser && typeof authedUser.id === 'number'){
+					let subscriptions = await us.getSubscriptions(token);
+					let subscriber = false;
+					let subLength = 0;
 					// if user has been globally banned
 					if(authedUser.banned){
 						// Make them an anonymous user, so they still can read chat
@@ -214,6 +224,15 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						socket.emit('sys', 'You are globally banned from Guac');
 						socket.join(roomName);
 						return;	
+					}
+					// If channel subscriptions are enabled, check if user is a subscriber
+					if(channelInfo.subEnabled){
+						for(const sub of subscriptions){
+							if(sub && sub.channel_stream_id === room.id){
+								subscriber = true;
+								subLength = monthDiff(new Date(sub.start_date) - new Date(sub.expiration_date));
+							}
+						}
 					}
 					// If user already exists in room
 					if(room.getUser(authedUser.name)){
@@ -235,6 +254,8 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 							authedUser.activated,
 							// If user has linked patreon OR has color, they are a patron
 							(authedUser.patreon && authedUser.patreon.isPatron) || authedUser.color,
+							subscriber,
+							subLength || 0,
 							authedUser.color,
 						);
 						// Check if banned from room
@@ -244,20 +265,23 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						}
 						//user.banned = authedUser.banned;
 					}
-					// Room owner will always have broadcaster badge
-					if(user.id === room.owner){
-						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', 0));
-					}else if(room.privileged.indexOf(user.id) > -1){ // Mods will always have mod badge
-						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', 0));
-					}
-					// Other badge types
+					// Global badges
 					switch(user.type){
 						case 'staff':
-							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', 2));
+							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', 0));
 						break;
 						case 'admin':
-							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', 2));
+							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', 0));
 						break;
+					}
+					// Room owner will always have broadcaster badge
+					if(user.id === room.owner){
+						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', 1));
+					}else if(room.privileged.indexOf(user.id) > -1){ // Mods will always have mod badge
+						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', 1));
+					}
+					if(user.subscriber){
+						user.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', 2));
 					}
 				}else{
 					console.error(token, authedUser);
