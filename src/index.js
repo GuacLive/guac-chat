@@ -228,10 +228,12 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					}
 					// If channel subscriptions are enabled, check if user is a subscriber
 					if(room.subEnabled){
-						for(const sub of subscriptions){
-							if(sub && sub.channel_stream_id === room.id){
-								subscriber = true;
-								subLength = monthDiff(new Date(sub.start_date) - new Date(sub.expiration_date));
+						if(typeof subscriptions === 'object'){
+							for(const sub of subscriptions){
+								if(sub && sub.channel_stream_id === room.id){
+									subscriber = true;
+									subLength = monthDiff(new Date(sub.start_date) - new Date(sub.expiration_date));
+								}
 							}
 						}
 					}
