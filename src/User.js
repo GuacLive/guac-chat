@@ -30,7 +30,7 @@ class User {
 			type: this.type,
 			socketId: this.socketId,
 			activated: this.activated,
-			isPatreon: this.isPatron,
+			isPatron: this.isPatron,
 			subscriber: this.subscriber,
 			subLength: this.subLength,
 			color: this.color,
