@@ -287,7 +287,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 						user.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', 2));
 					}
 					if(user.isPatron){
-						user.badges.set('patreon', new Badge('patron', 'PATRON', 'Patron', 3));
+						user.badges.set('patron', new Badge('patron', 'PATRON', 'Patron', 3));
 					}
 				}else{
 					console.error(token, authedUser);
