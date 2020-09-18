@@ -1,4 +1,4 @@
-const MAX_SLOT = 2;
+const MAX_SLOT = 3;
 class Badge {
     constructor(id, name, label, slot = 0){
         this.id = id;
