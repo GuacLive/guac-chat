@@ -451,6 +451,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				// Now do the thing
 				room.privileged.push(userToMod);
 				socket.emit('privileged', room.privileged);
+				u.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', false, 1));
 			}else{
 				socket.emit('sys', `user has been modded`);  
 			}
@@ -474,6 +475,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				// Now do the thing
 				room.privileged.splice(room.privileged.indexOf(userToMod));
 				socket.emit('privileged', room.privileged);
+				u.badges.delete('moderator');
 			}else{
 				socket.emit('sys', `user has been unmodded`);  
 			}
