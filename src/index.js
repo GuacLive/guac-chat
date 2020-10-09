@@ -437,7 +437,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.on('mod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
-			if(room.owner !== user.id || user.type !== 'staff'){ // if this user is not the owner or not staff
+			if(room.owner !== user.id && user.type !== 'staff'){ // if this user is not the owner or not staff
 				return false;
 			}
 			if(room.privileged.indexOf(userToMod) !== -1){ // user is already a mod
@@ -460,7 +460,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.on('unmod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
-			if(room.owner !== user.id && user.id !== userToMod && user.type !== 'staff'){ // is this user not the owner AND NOT yourself AND NOT staff?
+			if(room.owner !== user.id && user.type !== 'staff'){ // is this user not the owner AND NOT staff?
 				return false;
 			}
 			if(room.privileged.indexOf(userToMod) == -1){ // user is not a mod
