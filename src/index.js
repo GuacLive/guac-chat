@@ -109,11 +109,11 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		}
 	);
 
-	/*socketIO.adapter(redisAdapter({
+	socketIO.adapter(redisAdapter({
 		host: nconf.get('redis:connection:host'),
 		port: nconf.get('redis:connection:port'),
 		key: nconf.get('redis:connection:key')
-	}));*/
+	}));
 
 	const us = new UserService(global.nconf.get('server:api_url'));
 	const cs = new ChannelService(global.nconf.get('server:api_url'));
@@ -165,8 +165,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			room = rooms[roomName];
 
 			function emitViewers(){
-				var clients = socketIO.in(roomName).allSockets();
-				socket.emit('viewers', clients.size + 1);
+				socketIO.in(roomName).clients((err, clients) => {
+					socket.emit('viewers', clients.length + 1);
+				});
 			}
 			
 			emitViewers();
