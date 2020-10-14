@@ -40,6 +40,6 @@
     "nconf": "^0.10.0",
     "regenerator-runtime": "^0.13.1",
     "socket.io": "3.0.0-rc1",
-    "socket.io-redis": "^5.2.0"
+    "socket.io-redis": "https://github.com/GuacLive/socket.io-redis.git"
   }
 }
