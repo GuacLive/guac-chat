@@ -271,20 +271,23 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					// Global badges
 					switch(user.type){
 						case 'staff':
-							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', 0));
+							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', false, 0));
 						break;
 						case 'admin':
-							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', 0));
+							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', false, 0));
 						break;
 					}
 					// Room owner will always have broadcaster badge
 					if(user.id === room.owner){
-						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', 1));
+						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', false, 1));
 					}else if(room.privileged.indexOf(user.id) > -1){ // Mods will always have mod badge
-						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', 1));
+						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', false, 1));
 					}
 					if(user.subscriber){
-						user.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', 2));
+						user.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', false, 2));
+					}
+					if(user.isPatron){
+						user.badges.set('patron', new Badge('patron', 'PATRON', 'Patron', 'https://www.patreon.com/bePatron?u=19057109&utm_medium=widget', 3));
 					}
 				}else{
 					console.error(token, authedUser);
@@ -434,7 +437,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.on('mod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
-			if(room.owner !== user.id || user.type !== 'staff'){ // if this user is not the owner or not staff
+			if(room.owner !== user.id && user.type !== 'staff'){ // if this user is not the owner or not staff
 				return false;
 			}
 			if(room.privileged.indexOf(userToMod) !== -1){ // user is already a mod
@@ -448,6 +451,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				// Now do the thing
 				room.privileged.push(userToMod);
 				socket.emit('privileged', room.privileged);
+				u.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', false, 1));
 			}else{
 				socket.emit('sys', `user has been modded`);  
 			}
@@ -457,7 +461,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.on('unmod', async (userToMod) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
-			if(room.owner !== user.id && user.id !== userToMod && user.type !== 'staff'){ // is this user not the owner AND NOT yourself AND NOT staff?
+			if(room.owner !== user.id && user.type !== 'staff'){ // is this user not the owner AND NOT staff?
 				return false;
 			}
 			if(room.privileged.indexOf(userToMod) == -1){ // user is not a mod
@@ -471,6 +475,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				// Now do the thing
 				room.privileged.splice(room.privileged.indexOf(userToMod));
 				socket.emit('privileged', room.privileged);
+				u.badges.delete('moderator');
 			}else{
 				socket.emit('sys', `user has been unmodded`);  
 			}
