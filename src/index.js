@@ -165,7 +165,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			room = rooms[roomName];
 
 			function emitViewers(){
-				var clients = socketIO.in(roomName).allClients();
+				var clients = socketIO.in(roomName).allSockets();
 				socket.emit('viewers', clients.size + 1);
 			}
 			
