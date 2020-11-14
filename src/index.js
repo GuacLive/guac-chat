@@ -138,7 +138,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 	}
 	// In 60 seconds, clean up users list
 	setTimeout(() => {cleanupUsers();}, 60 * 1000);
-	socketIO.on('connection', (socket) => {
+	socketIO.on('connection', async (socket) => {
 		var roomName;
 		var room = null;
 		var user = null;
@@ -164,12 +164,12 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}
 			room = rooms[roomName];
 
-			function emitViewers(){
-				const clients = socketIO.in(roomName).allSockets();
+			async function emitViewers(){
+				const clients = await socketIO.in(roomName).allSockets();
 				socket.emit('viewers', clients.size);
 			}
 			
-			emitViewers();
+			await emitViewers();
 			// emit viewer count every 30 seconds
 			setInterval(emitViewers.bind(this), 30 * 1000);
 
