@@ -166,7 +166,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 			async function emitViewers(){
 				const clients = await socketIO.in(roomName).allSockets();
-				socket.emit('viewers', clients.size);
+				socket.emit('viewers', clients.size + 1);
 			}
 			
 			await emitViewers();
