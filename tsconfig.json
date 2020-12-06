@@ -12,7 +12,8 @@
 		"allowSyntheticDefaultImports": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"downlevelIteration'": true
 	},
 	"exclude": ["node_modules", "**/*.spec.ts"]
 }
