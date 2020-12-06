@@ -1,5 +1,5 @@
 import path from 'path';
-import nconf from 'nconf';
+var nconf = require('nconf');
 import pkg from '../package.json';
 
 const ENV = process.env.NODE_ENV || 'production';
