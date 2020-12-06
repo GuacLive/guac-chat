@@ -41,8 +41,8 @@ import UserService from './services/user';
 
 import ChannelService from './services/channel';
 
-import FlakeId from 'flake-idgen';
-import intformat from 'biguint-format';
+import * as FlakeId from 'flake-idgen';
+import * as intformat from 'biguint-format';
 
 import FloodProtection from 'flood-protection';
 
