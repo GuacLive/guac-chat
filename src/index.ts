@@ -25,9 +25,11 @@ nconf.defaults({
 
 global.nconf = nconf;
 
-import io from 'socket.io';
-
-import redisAdapter from 'socket.io-redis';
+import * as express from 'express';
+import * as socketIo from 'socket.io';
+import {RedisAdapter, createAdapter} from 'socket.io-redis';
+import {createServer } from 'http';
+import { RedisClient } from 'redis';
 
 import Badge from './Badge';
 
@@ -45,25 +47,25 @@ import intformat from 'biguint-format';
 import FloodProtection from 'flood-protection';
 
 import escapeHtml from 'escape-html';
+import IUser from './interfaces/IUser';
+import IRoom from './interfaces/IRoom';
 
-import {createServer} from 'http';
-import express from 'express';
 var cors = require('cors');
 
-const flake = new FlakeId({
-    epoch: new Date(2018, 5, 16)
+const flake: FlakeId = new FlakeId({
+    epoch: new Date(2018, 5, 16).getTime()
 })
 
 const generateFlake = () => intformat(flake.next(), 'dec');
-const truncate = (str, n, useWordBoundary) => {
+const truncate = (str: string, n: number, useWordBoundary?: boolean) => {
 	if(str.length <= n){return str;}
 	const subString = str.substr(0, n - 1); // the original check
 	return (useWordBoundary
 		? subString.substr(0, subString.lastIndexOf(' '))
-		: subString) + "&hellip;";
+		: subString) + '&hellip;';
 }
 const genRandomId = () => Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-function monthDiff(d1, d2){
+function monthDiff(d1: Date, d2: Date){
 	var months;
 	months = (d2.getFullYear() - d1.getFullYear()) * 12;
 	months -= d1.getMonth();
@@ -71,9 +73,7 @@ function monthDiff(d1, d2){
 	return months <= 0 ? 0 : months;
 }
 
-var rooms = [
-
-];
+var rooms: Map<string, IRoom> = new Map<string, IRoom>();
 
 const SHOW_JOIN_MESSAGE = false;
 const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
@@ -88,8 +88,8 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			res.sendStatus(400);
 			return;
 		}
-		if(rooms && rooms[req.params.room]){
-			var room = rooms[req.params.room];
+		if(rooms && rooms.get(req.params.room)){
+			var room = rooms.get(req.params.room);
 			// Serve 50 latest messages
 			res.send(JSON.stringify(room.messages.slice(-50)));
 		}else{
@@ -99,28 +99,35 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 	let server = createServer(_app);
 	server.listen(nconf.get('server:port'));
 
-	const socketIO = io(
-		server, 
-		{
-			wsEngine: 'eiows',
-			perMessageDeflate: {
-				threshold: 32768
-			}
+	const socketIO = require('socket.io')(server, {
+		wsEngine: 'eiows',
+		cors: {
+			origin: true,
+			methods: ['GET', 'POST'],
+			credentials: true
+		},
+		perMessageDeflate: {
+			threshold: 32768
 		}
-	);
+	});
 
-	socketIO.adapter(redisAdapter({
+	const pubClient = new RedisClient({
 		host: nconf.get('redis:connection:host'),
 		port: nconf.get('redis:connection:port'),
-		key: nconf.get('redis:connection:key')
-	}));
+		prefix: nconf.get('redis:connection:key')
+	});
+	const subClient = pubClient.duplicate();
+	
+	const adapter: RedisAdapter = createAdapter({ pubClient, subClient });
+	socketIO.adapter(adapter);  
 
 	const us = new UserService(global.nconf.get('server:api_url'));
 	const cs = new ChannelService(global.nconf.get('server:api_url'));
 	function cleanupUsers(){
-		rooms.forEach((room, i) => {
+		var i = 0;
+		rooms.forEach((room: IRoom) => {
 			if(room && room.users){
-				room.users.forEach((userVal, key) => {
+				room.users.forEach((userVal: any, key: string) => {
 					if(userVal){
 						// If we haven't received a heartbeat in 900 seconds (15 minutes)
 						if(userVal.heartbeat <= (new Date).getTime() - (900 * 1000)){
@@ -130,18 +137,19 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					}
 				});
 			}
+			i++;
 			// We are done purging user list, so restart the function in 60 seconds
-			if(rooms.length === i - 1){
+			if(rooms.size === i - 1){
 				setTimeout(() => {cleanupUsers();}, 60 * 1000);
 			}
 		});
 	}
 	// In 60 seconds, clean up users list
 	setTimeout(() => {cleanupUsers();}, 60 * 1000);
-	socketIO.on('connection', async (socket) => {
-		var roomName;
-		var room = null;
-		var user = null;
+	socketIO.on('connection', async (socket: socketIo.Socket) => {
+		var roomName: string;
+		var room: Room = null;
+		var user: IUser = null;
 		var floodProtection = new FloodProtection({
 			rate: 4,
 			// default: 5, unit: messages
@@ -154,7 +162,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		socket.emit('version', pkg.version);
 
 		// room name is second paramter for backwards compatability
-		socket.on('join', async (token, joinRoomName) => {
+		socket.on('join', async (token: string, joinRoomName: string) => {
 			roomName = joinRoomName;
 			// If name is not provided in join or in referrer, tell user to room is invalid
 			if(!roomName || typeof roomName !== 'string'){
@@ -162,7 +170,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				socket.emit('sys', 'Invalid room type');  
 				return;
 			}
-			room = rooms[roomName];
+			room = rooms.get(roomName);
 
 			async function emitViewers(){
 				const clients = await socketIO.in(roomName).allSockets();
@@ -174,10 +182,11 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			setInterval(emitViewers.bind(this), 30 * 1000);
 
 			if(!room){
-				rooms[roomName] = room = new Room(
+				room = new Room(
 					null,
 					roomName
 				);
+				rooms.set(roomName, room);
 
 				// Get channel info, and check if valid
 				let channelInfo = await cs.getChannel(roomName);
@@ -197,7 +206,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				}else{
 					console.error(roomName, channelInfo);
 					socket.emit('sys', 'Channel does not exist');
-					delete rooms[roomName];
+					rooms.delete(roomName);
 					return;
 				}
 			}
@@ -231,7 +240,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 							for(const sub of subscriptions){
 								if(sub && sub.channel_stream_id === room.id){
 									subscriber = true;
-									subLength = monthDiff(new Date(sub.start_date) - new Date(sub.expiration_date));
+									subLength = monthDiff(new Date(sub.start_date.toString), new Date(sub.expiration_date));
 								}
 							}
 						}
@@ -270,20 +279,20 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 					// Global badges
 					switch(user.type){
 						case 'staff':
-							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', false, 0));
+							user.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', '', 0));
 						break;
 						case 'admin':
-							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', false, 0));
+							user.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', '', 0));
 						break;
 					}
 					// Room owner will always have broadcaster badge
 					if(user.id === room.owner){
-						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', false, 1));
+						user.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', '', 1));
 					}else if(room.privileged.indexOf(user.id) > -1){ // Mods will always have mod badge
-						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', false, 1));
+						user.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', '', 1));
 					}
 					if(user.subscriber){
-						user.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', false, 2));
+						user.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', '', 2));
 					}
 					if(user.isPatron){
 						user.badges.set('patron', new Badge('patron', 'PATRON', 'Patron', 'https://www.patreon.com/bePatron?u=19057109&utm_medium=widget', 3));
@@ -321,7 +330,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		});
 
 
-		socket.conn.on('packet', (packet) => {
+		socket.conn.on('packet', (packet: {type: string;}) => {
 			console.log('received', packet.type);
 			if(packet.type === 'ping'){
 				if(!room || !user){
@@ -366,7 +375,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			}
 		});
 
-		socket.on('delete', (msgID) => {
+		socket.on('delete', (msgID: string) => {
 			console.log('Inside delete', user, msgID);
 			if(typeof user !== 'object' || typeof msgID !== 'string') return false;
 			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
@@ -379,7 +388,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			return false;
 		});
 
-		socket.on('ban', async (userToBan) => {
+		socket.on('ban', async (userToBan: number) => {
 			console.log('spellspell', room.privileged, user.id, userToBan)
 			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
 			// Staff can ban anyone
@@ -407,7 +416,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			return false;
 		});
 
-		socket.on('unban', async (userToBan) => {
+		socket.on('unban', async (userToBan: any) => {
 			if(typeof user !== 'object' || typeof userToBan !== 'number') return false;
 			// Staff can ban anyone
 			if(user.type !== 'staff'){
@@ -433,7 +442,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			return false;
 		});
 
-		socket.on('mod', async (userToMod) => {
+		socket.on('mod', async (userToMod: any) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
 			if(room.owner !== user.id && user.type !== 'staff'){ // if this user is not the owner or not staff
@@ -450,14 +459,14 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				// Now do the thing
 				room.privileged.push(userToMod);
 				socket.emit('privileged', room.privileged);
-				u.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', false, 1));
+				u.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', '', 1));
 			}else{
 				socket.emit('sys', `user has been modded`);  
 			}
 			return false;
 		});
 
-		socket.on('unmod', async (userToMod) => {
+		socket.on('unmod', async (userToMod: any) => {
 			console.log('spellspell', room.privileged, user.id, userToMod)
 			if(typeof user !== 'object' || typeof userToMod !== 'number') return false;
 			if(room.owner !== user.id && user.type !== 'staff'){ // is this user not the owner AND NOT staff?
@@ -481,7 +490,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			return false;
 		});
 
-		socket.on('timeout', async (userToBan, time) => {
+		socket.on('timeout', async (userToBan: any, time: number) => {
 			console.log('spellspell', room.privileged, user.id, userToBan, time)
 			if(typeof user !== 'object' || typeof userToBan !== 'number' || typeof time !== 'number') return false;
 			if(room.privileged.indexOf(user.id) === -1){ // is this user not a mod?
@@ -503,7 +512,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 			return false;
 		});
 
-		socket.on('message', (msgs) => {
+		socket.on('message', (msgs: {[x: string]: any; map: (arg0: (msg: any) => any) => {(): any; new(): any; join: {(arg0: string): {(): any; new(): any; length: number;}; new(): any;};}; forEach: (arg0: (msg: any, i: any) => void) => void; length: number;}) => {
 			console.log('bab', room, user, msgs);
 			if(!room){
 				return false;
@@ -538,12 +547,12 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 				if(typeof msgs == 'object'){
 					try{
 						// NEW content length check
-						if(msgs.map((msg) => msg && msg.type === 'text' ? msg.content : '').join(' ').length > 240){
+						if(msgs.map((msg: {type: string; content: any;}) => msg && msg.type === 'text' ? msg.content : '').join(' ').length > 240){
 							socket.emit('sys', 'Your message is too long.');  
 							return false;
 						}
 					}catch{}
-					msgs.forEach((msg, i) => {
+					msgs.forEach((msg: {content: string; type: any;}, i: number) => {
 						// If message has content
 						if(msg && msg.content){	
 							msg.content = escapeHtml(msg.content);

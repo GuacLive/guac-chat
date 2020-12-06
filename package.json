@@ -1,10 +1,15 @@
 {
   "name": "guac-chat",
-  "version": "1.1",
+  "version": "2.0.0-alpha.0",
   "description": "Chat for guac",
-  "main": "src/babel.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/babel"
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "dev": "tsc-watch -p tsconfig.json --onSuccess 'node ./lib/index.js'",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -26,6 +31,11 @@
     "@babel/runtime": "^7.2.0"
   },
   "dependencies": {
+    "@types/escape-html": "^1.0.0",
+    "@types/flake-idgen": "^0.1.30",
+    "@types/nconf": "^0.10.0",
+    "@types/redis": "^2.8.28",
+    "@types/socket.io": "^2.1.11",
     "biguint-format": "^1.0.1",
     "core-js": "^3.5.0",
     "cors": "^2.8.5",
@@ -38,8 +48,12 @@
     "jsonwebtoken": "^8.2.1",
     "linkify-urls": "^3.1.0-nolookbehind",
     "nconf": "^0.10.0",
+    "redis": "^3.0.2",
     "regenerator-runtime": "^0.13.1",
+    "rimraf": "^3.0.2",
     "socket.io": "^3.0",
-    "socket.io-redis": "^6.0.0"
+    "socket.io-redis": "^6.0.0",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.0.0-dev.20200615"
   }
 }
