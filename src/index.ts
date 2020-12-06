@@ -1,4 +1,4 @@
-import path from 'path';
+import * as path from 'path';
 var nconf = require('nconf');
 import pkg from '../package.json';
 
