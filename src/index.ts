@@ -1,6 +1,6 @@
 import * as path from 'path';
 var nconf = require('nconf');
-import pkg from '../package.json';
+import * as pkg from '../package.json';
 
 const ENV = process.env.NODE_ENV || 'production';
 
@@ -44,7 +44,7 @@ import ChannelService from './services/channel';
 import * as FlakeId from 'flake-idgen';
 import * as intformat from 'biguint-format';
 
-import FloodProtection from 'flood-protection';
+import * as FloodProtection from 'flood-protection';
 
 import escapeHtml from 'escape-html';
 import IUser from './interfaces/IUser';
