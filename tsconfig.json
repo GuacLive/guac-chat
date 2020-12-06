@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"lib": [ "es2015", "es2020", "dom" ],
-		"target": "es5",
+		"target": "es2020",
 		"sourceMap": true,
 		"outDir": "build",
 		"typeRoots": ["node_modules/@types", "src/types"],
