@@ -44,7 +44,7 @@ import ChannelService from './services/channel';
 import * as FlakeId from 'flake-idgen';
 import * as intformat from 'biguint-format';
 
-import * as FloodProtection from 'flood-protection';
+import FloodProtection from 'flood-protection';
 
 import escapeHtml from 'escape-html';
 import IUser from './interfaces/IUser';
