@@ -1,11 +1,10 @@
 {
 	"compilerOptions": {
 		"module": "commonjs",
-		"target": "es2017",
-		"declaration": true,
-		"moduleResolution": "node",
+		"lib": [ "es2015", "es2020", "dom" ],
+		"target": "es5",
 		"sourceMap": true,
-		"outDir": "lib",
+		"outDir": "build",
 		"typeRoots": ["node_modules/@types", "src/types"],
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
@@ -17,6 +16,5 @@
 		"isolatedModules": true,
 		"resolveJsonModule": true
 	},
-	"include": ["src/**/*"],
 	"exclude": ["node_modules", "**/*.spec.ts"]
 }
