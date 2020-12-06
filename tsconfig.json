@@ -12,8 +12,6 @@
 		"allowSyntheticDefaultImports": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		// Ensure that Babel can safely transpile files in the TypeScript project
-		"isolatedModules": true,
 		"resolveJsonModule": true
 	},
 	"exclude": ["node_modules", "**/*.spec.ts"]
