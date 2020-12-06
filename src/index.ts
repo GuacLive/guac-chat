@@ -25,7 +25,7 @@ nconf.defaults({
 
 global.nconf = nconf;
 
-import * as express from 'express';
+import express from 'express';
 import * as socketIo from 'socket.io';
 import {RedisAdapter, createAdapter} from 'socket.io-redis';
 import {createServer } from 'http';
@@ -41,8 +41,8 @@ import UserService from './services/user';
 
 import ChannelService from './services/channel';
 
-import * as FlakeId from 'flake-idgen';
-import * as intformat from 'biguint-format';
+import FlakeId from 'flake-idgen';
+import intformat from 'biguint-format';
 
 import FloodProtection from 'flood-protection';
 
@@ -83,7 +83,7 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 	_app.use(cors());
 	_app.use(express.json());
 	_app.options('*', cors());
-	_app.get('/messages/:room', async (req, res) => {
+	_app.get('/messages/:room', async (req: express.Request, res: express.Response) => {
 		if(!USERNAME_REGEX.test(req.params.room)){
 			res.sendStatus(400);
 			return;
@@ -95,6 +95,9 @@ const USERNAME_REGEX = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 		}else{
 			res.send(JSON.stringify([]));
 		}
+	});
+	_app.get('/',  async (_req: express.Request, res: express.Response) => {
+		res.send(`guac chat server ${pkg.version}\r\n https://github.com/GuacLive/guac-chat`);
 	});
 	let server = createServer(_app);
 	server.listen(nconf.get('server:port'));
