@@ -36,6 +36,30 @@ class User implements IUser {
 		this.badges = new Map<string, Badge>();
 	}
 
+	initBadges(owner: number, privileged: Array<number>){
+		// Global badges
+		switch (this.type) {
+			case 'staff':
+				this.badges.set('staff', new Badge('staff', 'STAFF', 'Staff', '', 0));
+				break;
+			case 'admin':
+				this.badges.set('admin', new Badge('admin', 'ADMIN', 'Admin', '', 0));
+				break;
+		}
+		// Room owner will always have broadcaster badge
+		if (this.id === owner) {
+			this.badges.set('broadcaster', new Badge('broadcaster', 'BROADCASTER', 'Broadcaster', '', 1));
+		} else if (privileged.indexOf(this.id) > -1) { // Mods will always have mod badge
+			this.badges.set('moderator', new Badge('moderator', 'MODERATOR', 'Moderator', '', 1));
+		}
+		if (this.subscriber) {
+			this.badges.set('subscriber', new Badge('subscriber', 'SUBSCRIBER', 'Subscriber', '', 2));
+		}
+		if (this.isPatron) {
+			this.badges.set('patron', new Badge('patron', 'PATRON', 'Patron', 'https://www.patreon.com/bePatron?u=19057109&utm_medium=widget', 3));
+		}
+	}
+
 	toJSON(): any{
 		// TODO: Find a different way to do this?
 		let cloned = {

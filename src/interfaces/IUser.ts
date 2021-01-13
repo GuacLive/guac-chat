@@ -2,6 +2,7 @@ import IBadge from './IBadge';
 
 type ObjectAlias = object;
 export default interface IUser extends ObjectAlias {
+	initBadges(owner: number, privileged: Array<number>): void;
 	toJSON?: () => IUser;
 	id: number;
 	name: string;

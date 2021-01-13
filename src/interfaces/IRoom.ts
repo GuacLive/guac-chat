@@ -11,7 +11,7 @@ export default interface IRoom extends ObjectAlias {
 	timeouts: Map<string, number>;
 	emotes: Object;
 	messages: Array<IMessage>;
-	owner: Number | null;
+	owner: number | null;
 	subEnabled: Boolean;
 
 	addMessage(msg: IMessage): void;

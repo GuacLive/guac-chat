@@ -11,7 +11,7 @@ class Room {
 	public timeouts: Map<string, number>;
 	public emotes: Object;
 	public messages: Array<IMessage>;
-	public owner: Number | null;
+	public owner: number | null;
 	public subEnabled: Boolean;
 
 	constructor(id: number, name: string){
