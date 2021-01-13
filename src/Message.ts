@@ -50,6 +50,8 @@ class Message implements IMessage {
 					this.room.modifyUser(this.user);
 				}
 				this.room.addMessage(this.toJSON());
+				console.log('we are gonna send now');
+				console.log(this.room.name,this.user.toJSON(), this.id, this.msgs, this.socket);
 				this.socket.in(this.room.name).emit('msgs', this.user.toJSON(), this.id, this.msgs);
 			}
 		});
