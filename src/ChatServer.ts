@@ -517,6 +517,10 @@ export class ChatServer {
 					if (typeof msgs == 'object') {
 						const message = new Message(self.io, room, user, msgs);
 						message.send();
+						// Update user in rooms object
+						if (message.user) {
+							room.modifyUser(message.user);
+						}
 					}
 				} else {
 					socket.emit('sys', `You are typing too fast.`);

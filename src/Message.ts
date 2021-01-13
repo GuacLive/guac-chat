@@ -44,10 +44,6 @@ class Message implements IMessage {
 				var lastMessage = (new Date).getTime();
 				// Set lastMessage on user
 				this.user.lastMessage = this.time = lastMessage;
-				if (this.user) {
-					// Update user in rooms object
-					this.room.modifyUser(this.user);
-				}
 				this.room.addMessage(this.toJSON());
 				this.socket.in(this.room.name).emit('msgs', this.user.toJSON(), this.id, this.msgs);
 			}
