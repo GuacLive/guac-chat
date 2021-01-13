@@ -515,7 +515,7 @@ export class ChatServer {
 
 				if (floodProtection.check()) {
 					if (typeof msgs == 'object') {
-						const message = new Message(socket, room, user, msgs);
+						const message = new Message(self.io, room, user, msgs);
 						message.send();
 					}
 				} else {

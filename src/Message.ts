@@ -1,5 +1,5 @@
 import escapeHtml from "escape-html";
-import {Socket} from "socket.io";
+import SocketIO from "socket.io";
 import IMessage from "./interfaces/IMessage";
 import IUser from "./interfaces/IUser";
 import Room from "./Room";
@@ -12,7 +12,7 @@ class Message implements IMessage {
 	messages: any;
 	room: any;
 	socket: any;
-	constructor(socket: Socket, room: Room, user: IUser, messages: IMessage[]){
+	constructor(socket: SocketIO.Server, room: Room, user: IUser, messages: IMessage[]){
 		this.id = generateFlake();
 		this.room = room;
 		this.socket = socket;
@@ -50,8 +50,6 @@ class Message implements IMessage {
 					this.room.modifyUser(this.user);
 				}
 				this.room.addMessage(this.toJSON());
-				console.log('we are gonna send now');
-				console.log(this.room.name,this.user.toJSON(), this.id, this.msgs, this.socket);
 				this.socket.in(this.room.name).emit('msgs', this.user.toJSON(), this.id, this.msgs);
 			}
 		});
