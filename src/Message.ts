@@ -1,5 +1,4 @@
 import escapeHtml from "escape-html";
-import SocketIO from "socket.io";
 import IMessage from "./interfaces/IMessage";
 import IUser from "./interfaces/IUser";
 import Room from "./Room";
