@@ -46,10 +46,10 @@ class Message implements IMessage {
 					// Set lastMessage on user
 					this.user.lastMessage = this.time = lastMessage;
 					this.room.addMessage(this.toJSON());
-					this.socket.in(this.room.name)
-					.emit('msgs', this.user.toJSON(), this.id, this.msgs, () => {
-						resolve(true);
-					});
+					this.socket
+					.in(this.room.name)
+					.emit('msgs', this.user.toJSON(), this.id, this.msgs);
+					resolve(true);
 				} else if(this.msgs.length === 0){
 					resolve(false);
 				}
