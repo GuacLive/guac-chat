@@ -115,19 +115,18 @@ export class ChatServer {
 				threshold: 32768
 			}
 		});;
-		if (process.env.REDIS_URL) {
-			const pubClient = new RedisClient({
-				host: nconf.get('redis:connection:host'),
-				port: nconf.get('redis:connection:port'),
-				prefix: nconf.get('redis:connection:key')
-			});
-			const subClient = pubClient.duplicate();
-			const adapter: RedisAdapter = createAdapter({pubClient, subClient});
-			this.io.adapter(adapter);
-		}
+		const pubClient = new RedisClient({
+			host: nconf.get('redis:connection:host'),
+			port: nconf.get('redis:connection:port'),
+			prefix: nconf.get('redis:connection:key')
+		});
+		const subClient = pubClient.duplicate();
+		const adapter: RedisAdapter = createAdapter({pubClient, subClient});
+		this.io.adapter(adapter);
 	}
 
 	private listen(): void {
+		var self = this;
 		this.server.listen(this.port, () => {
 			console.log('[guac.live]', `Running chat server on port ${this.port}`);
 		});
@@ -160,7 +159,8 @@ export class ChatServer {
 				room = rooms.get(roomName);
 
 				async function emitViewers() {
-					const clients = await this.io.in(roomName).allSockets();
+					// @tslint-ignore
+					const clients = await (self.io.in(roomName) as any).allSockets();
 					socket.emit('viewers', clients.size + 1);
 				}
 
@@ -287,9 +287,9 @@ export class ChatServer {
 					socket.join(roomName);
 					socket.emit('users', [...room.users.values()]);
 					if (!user.anon) {
-						this.io.sockets.in(roomName).emit('join', user);
+						self.io.sockets.in(roomName).emit('join', user);
 						if (showJoinMessage) {
-							this.io.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
+							self.io.sockets.in(roomName).emit('sys', user.name + ' has joined', room);
 						}
 						console.log(JSON.stringify(user) + ' joined' + roomName);
 					}
@@ -329,7 +329,7 @@ export class ChatServer {
 					if (u) {
 						room.removeUser(u.name);
 						if (!u.anon) {
-							this.io.sockets.in(roomName).emit('leave', u);
+							self.io.sockets.in(roomName).emit('leave', u);
 							console.log(JSON.stringify(u) + ' has left ' + room.name || roomName);
 						}
 					}
@@ -338,7 +338,7 @@ export class ChatServer {
 					if (room.getUser(user.name)) {
 						room.removeUser(user.name);
 						if (!user.anon) {
-							this.io.sockets.in(roomName).emit('leave', user);
+							self.io.sockets.in(roomName).emit('leave', user);
 							console.log(JSON.stringify(user) + ' has left ' + room.name || roomName);
 						}
 					}
@@ -354,7 +354,7 @@ export class ChatServer {
 
 				socket.emit('sys', `Message has been deleted`);
 				room.removeMessage(msgID);
-				this.io.sockets.in(roomName).emit('delete', msgID);
+				self.io.sockets.in(roomName).emit('delete', msgID);
 				return false;
 			});
 
