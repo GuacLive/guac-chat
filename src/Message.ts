@@ -47,8 +47,7 @@ class Message implements IMessage {
 					this.user.lastMessage = this.time = lastMessage;
 					this.room.addMessage(this.toJSON());
 					this.socket.in(this.room.name)
-					.emit('msgs', this.user.toJSON(), this.id, this.msgs)
-					.then(() => {
+					.emit('msgs', this.user.toJSON(), this.id, this.msgs, () => {
 						resolve(true);
 					});
 				} else if(this.msgs.length === 0){
