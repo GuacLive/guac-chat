@@ -482,7 +482,7 @@ export class ChatServer {
 				return false;
 			});
 
-			socket.on('message', (msgs: IMessage[]) => {
+			socket.on('message', async (msgs: IMessage[]) => {
 				console.log('bab', room, user, msgs);
 				if (!room) {
 					return false;
@@ -516,7 +516,7 @@ export class ChatServer {
 				if (floodProtection.check()) {
 					if (typeof msgs == 'object') {
 						const message = new Message(self.io, room, user, msgs);
-						message.send();
+						await message.send();
 						// Update user in rooms object
 						if (message.user) {
 							room.modifyUser(message.user);
