@@ -386,7 +386,7 @@ export class ChatServer {
 				return false;
 			});
 
-			socket.on('unban', async (userToBan: any) => {
+			socket.on('unban', async (userToBan: number) => {
 				if (typeof user !== 'object' || typeof userToBan !== 'number') return false;
 				// Staff can ban anyone
 				if (user.type !== 'staff') {
@@ -412,7 +412,7 @@ export class ChatServer {
 				return false;
 			});
 
-			socket.on('mod', async (userToMod: any) => {
+			socket.on('mod', async (userToMod: number) => {
 				console.log('spellspell', room.privileged, user.id, userToMod)
 				if (typeof user !== 'object' || typeof userToMod !== 'number') return false;
 				if (room.owner !== user.id && user.type !== 'staff') { // if this user is not the owner or not staff
@@ -436,7 +436,7 @@ export class ChatServer {
 				return false;
 			});
 
-			socket.on('unmod', async (userToMod: any) => {
+			socket.on('unmod', async (userToMod: number) => {
 				console.log('spellspell', room.privileged, user.id, userToMod)
 				if (typeof user !== 'object' || typeof userToMod !== 'number') return false;
 				if (room.owner !== user.id && user.type !== 'staff') { // is this user not the owner AND NOT staff?
