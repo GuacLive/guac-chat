@@ -380,6 +380,8 @@ export class ChatServer {
 					socket.emit('sys', `${u.name} has been banned`);
 					// Now do the thing
 					u.banned = true;
+					// Remove messages from user
+					room.removeMessageFromUser(u.id);
 				} else {
 					socket.emit('sys', `user has been banned`);
 				}
@@ -476,6 +478,9 @@ export class ChatServer {
 					socket.emit('sys', `${u.name} has been timed out for ${time} seconds`);
 					// Now do the thing
 					u.timeout = room.timeouts.get(u.name);
+					// Remove messages from user
+					room.removeMessageFromUser(u.id);
+
 				} else {
 					socket.emit('sys', `Could not time out user`);
 				}

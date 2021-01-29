@@ -37,6 +37,10 @@ class Room {
 		this.messages = this.messages.filter((msg: IMessage) => msg.id !== id);
 	}
 
+	removeMessageFromUser(user: number): void{
+		this.messages = this.messages.filter((msg: IMessage) => msg.user.id !== user);
+	}
+
 	addUser(args: IUser): IUser{
 		if(!args) return null;
 		const normalized = args.name.toLowerCase();
