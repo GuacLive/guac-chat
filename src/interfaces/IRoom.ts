@@ -16,6 +16,8 @@ export default interface IRoom extends ObjectAlias {
 
 	addMessage(msg: IMessage): void;
 	removeMessage(id: string): void;
+	removeMessageFromUser(user: number): void;
+
 
 	addUser(args: IUser): IUser;
 	

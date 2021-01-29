@@ -23,6 +23,7 @@ nconf.defaults({
 });
 //nconf.save();
 
+// @ts-ignore
 global.nconf = nconf;
 
 import express from 'express';
@@ -51,6 +52,7 @@ var cors = require('cors');
 import {genRandomId, monthDiff} from './util';
 import Message from './Message';
 import IMessage from './interfaces/IMessage';
+import SocketIO from 'socket.io';
 
 var rooms: Map<string, IRoom> = new Map<string, IRoom>();
 
@@ -99,7 +101,9 @@ export class ChatServer {
     }
 
 	private initServices(): void {
+		// @ts-ignore
 		this.userService = new UserService(global.nconf.get('server:api_url'));
+		// @ts-ignore
 		this.channelService = new ChannelService(global.nconf.get('server:api_url'));
 	}
 
