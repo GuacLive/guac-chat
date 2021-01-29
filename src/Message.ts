@@ -4,6 +4,7 @@ import IUser from "./interfaces/IUser";
 import Room from "./Room";
 import {generateFlake, truncate} from "./util";
 
+import * as socketIo from 'socket.io';
 class Message implements IMessage {
 	id: string;
 	time: number;
@@ -11,7 +12,7 @@ class Message implements IMessage {
 	messages: any;
 	room: any;
 	socket: any;
-	constructor(socket: SocketIO.Server, room: Room, user: IUser, messages: IMessage[]){
+	constructor(socket: socketIo.Server, room: Room, user: IUser, messages: IMessage[]){
 		this.id = generateFlake();
 		this.room = room;
 		this.socket = socket;

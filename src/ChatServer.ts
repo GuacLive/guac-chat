@@ -28,7 +28,7 @@ global.nconf = nconf;
 
 import express from 'express';
 import * as socketIo from 'socket.io';
-import {RedisAdapter, createAdapter} from 'socket.io-redis';
+import {createAdapter} from 'socket.io-redis';
 import {createServer, Server} from 'http';
 import {RedisClient} from 'redis';
 
@@ -125,7 +125,7 @@ export class ChatServer {
 			prefix: nconf.get('redis:connection:key')
 		});
 		const subClient = pubClient.duplicate();
-		const adapter: RedisAdapter = createAdapter({pubClient, subClient});
+		const adapter = createAdapter({pubClient, subClient});
 		this.io.adapter(adapter);
 	}
 
