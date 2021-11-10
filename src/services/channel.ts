@@ -120,7 +120,7 @@ export default class ChannelService {
 			return json;
 		})
 		.catch((error: any) => {
-			throw error;
+			return {};
 		});
 	}
 
@@ -148,7 +148,7 @@ export default class ChannelService {
 			return json;
 		})
 		.catch((error: any) => {
-			throw error;
+			return {};
 		});
 	}
 

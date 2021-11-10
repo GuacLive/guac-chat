@@ -1,6 +1,22 @@
+import express from 'express';
+import FloodProtection from 'flood-protection';
+import {createServer, Server} from 'http';
 import * as path from 'path';
-var nconf = require('nconf');
+import {RedisClient} from 'redis';
+import SocketIO, * as socketIo from 'socket.io';
+import {createAdapter} from 'socket.io-redis';
 import * as pkg from '../package.json';
+import Badge from './Badge';
+import IMessage from './interfaces/IMessage';
+import IRoom from './interfaces/IRoom';
+import IUser from './interfaces/IUser';
+import Message from './Message';
+import Room from './Room';
+import ChannelService from './services/channel';
+import UserService from './services/user';
+import User from './User';
+import {genRandomId, monthDiff} from './util';
+var nconf = require('nconf');
 
 const ENV = process.env.NODE_ENV || 'production';
 
@@ -26,33 +42,16 @@ nconf.defaults({
 // @ts-ignore
 global.nconf = nconf;
 
-import express from 'express';
-import * as socketIo from 'socket.io';
-import {createAdapter} from 'socket.io-redis';
-import {createServer, Server} from 'http';
-import {RedisClient} from 'redis';
 
-import Badge from './Badge';
 
-import Room from './Room';
 
-import User from './User';
 
-import UserService from './services/user';
 
-import ChannelService from './services/channel';
 
-import FloodProtection from 'flood-protection';
 
-import IUser from './interfaces/IUser';
-import IRoom from './interfaces/IRoom';
 
 var cors = require('cors');
 
-import {genRandomId, monthDiff} from './util';
-import Message from './Message';
-import IMessage from './interfaces/IMessage';
-import SocketIO from 'socket.io';
 
 var rooms: Map<string, IRoom> = new Map<string, IRoom>();
 
