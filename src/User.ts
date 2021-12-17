@@ -60,6 +60,7 @@ class User implements IUser {
 		}
 		const now = (new Date);
 		if( this.name === 'datagutt' && now.getMonth() === 11 && now.getDate() === 17) {
+			this.badges.delete('patron');
 			this.badges.set('birthday', new Badge('birthday', 'BIRTHDAY', 'User has birthday', 'https://www.youtube.com/watch?v=vdVnnMOTe3Q', 3));
 
 		}
