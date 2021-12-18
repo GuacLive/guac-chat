@@ -59,10 +59,9 @@ class User implements IUser {
 			this.badges.set('patron', new Badge('patron', 'PATRON', 'Patron', 'https://www.patreon.com/bePatron?u=19057109&utm_medium=widget', 3));
 		}
 		const now = (new Date);
-		if( this.name === 'datagutt' && now.getMonth() === 11 && now.getDate() === 17) {
+		if( this.name === 'data' && now.getMonth() === 11 && now.getDate() === 18) {
 			this.badges.delete('patron');
 			this.badges.set('birthday', new Badge('birthday', 'BIRTHDAY', 'User has birthday', 'https://www.youtube.com/watch?v=vdVnnMOTe3Q', 3));
-
 		}
 	}
 
