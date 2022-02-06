@@ -1,29 +1,47 @@
+import IUser from './interfaces/IUser';
+import IMessage from './interfaces/IMessage';
+
 const MAX_LINES = 100;
 class Room {
-	constructor(id, name){
+	public id: number;
+	public name: string;
+	public users: Map<string, IUser>;
+	public privileged: any;
+	public bans: Array<number>;
+	public timeouts: Map<string, number>;
+	public emotes: Object;
+	public messages: Array<IMessage>;
+	public owner: number | null;
+	public subEnabled: Boolean;
+
+	constructor(id: number, name: string){
 		this.id = id;
 		this.name = name;
-		this.users = new Map();
+		this.users = new Map<string, IUser>();
 		this.privileged = [];
 		this.bans = [];
-		this.timeouts = new Map();
+		this.timeouts = new Map<string, number>();
 		this.emotes = {};
 		this.messages = [];
 		this.owner = null;
 	}
 
-	addMessage(msg){
+	addMessage(msg: IMessage): void{
 		this.messages.push(msg);
 		if(this.messages && this.messages.length >= MAX_LINES){
             this.messages = this.messages.slice(-MAX_LINES);
 		}
 	}
 
-	removeMessage(id){
-		this.messages = this.messages.filter((msg) => msg.id !== id);
+	removeMessage(id: string): void{
+		this.messages = this.messages.filter((msg: IMessage) => msg.id !== id);
 	}
 
-	addUser(args){
+	removeMessageFromUser(user: number): void{
+		this.messages = this.messages.filter((msg: IMessage) => msg.user.id !== user);
+	}
+
+	addUser(args: IUser): IUser{
 		if(!args) return null;
 		const normalized = args.name.toLowerCase();
 		let user = this.users.get(normalized);
@@ -34,14 +52,14 @@ class Room {
 		return user;
 	}
 	
-	modifyUser(args){
+	modifyUser(args: IUser): void{
 		if(!args) return null;
 		const normalized = args.name.toLowerCase();
 		let user = this.users.get(normalized);
 		this.users.set(normalized, user);
 	}
 
-	getUserById(id){
+	getUserById(id: number): IUser | false{
 		if(typeof id !== 'number') return null;
 		//const normalized = name.toLowerCase();
 		let username =  Array.from(this.users).map((data) => {
@@ -51,35 +69,35 @@ class Room {
 		return username ? this.getUser(username[0]) : false;
 	}
 
-	getUserBySocketId(socketId){
-		if(typeof socketId !== 'number') return null;
+	getUserBySocketId(socketId: string): IUser {
+		if(typeof socketId !== 'string') return null;
 		//const normalized = name.toLowerCase();
-		let username =  Array.from(this.users).map((data) => {
-			if(data.length < 2) return;
-			if(data[1].socketId === socketId) return data[0].toLowerCase();
+		let username = Array.from(this.users).map((data) => {
+			if(data.length < 2 || !socketId) return;
+			if(data[1] && data[1].socketId === socketId.toString()) return data[0].toLowerCase();
 		});
-		return username ? this.getUser(username[0]) : false;
+		return username ? this.getUser(username[0]) : null;
 	}
 
-	getUser(name){
+	getUser(name: string): IUser {
 		if(!name) return null;
 		const normalized = name.toLowerCase();
-		return this.users.get(normalized) || false;
+		return this.users.get(normalized);
 	}
 
-	removeUser(name){
+	removeUser(name: string): boolean{
 		if(!name) return null;
 		const normalized = name.toLowerCase();
 		return this.users.delete(normalized) || false;
 	}
 
-	isUserBanned(name, id){
+	isUserBanned(name: string, id: number): boolean{
 		if(!name || typeof id !== 'number') return null;
 		const normalized = name.toLowerCase();
 		return this.bans.indexOf(id) >= 0 || (this.users.get(normalized) && this.users.get(normalized).banned);
 	}
 
-	isUserTimedout(name) {
+	isUserTimedout(name: string): boolean{
 		if(!name) return null;
 		const normalized = name.toLowerCase();
 		let user = this.getUser(normalized);

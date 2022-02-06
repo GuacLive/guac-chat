@@ -1,11 +1,13 @@
 import ApiService from './api';
 
 export default class ChannelService {
-	constructor(API_URL){
+	public ApiService: any;
+
+	constructor(API_URL: string){
 		this.ApiService = new ApiService(API_URL);
 	}
 
-	async getChannel(channel) {
+	async getChannel(channel: string) {
 		if(typeof channel !== 'string') return;
 		return await this.ApiService.callApi('/watch/' + channel, {
 			method: 'GET',
@@ -13,8 +15,8 @@ export default class ChannelService {
 				'Content-Type': 'application/json'
 			}
 		})
-		.then(response => response.json())
-		.then((json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then((json: {statusCode: number; data: any;}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -23,12 +25,12 @@ export default class ChannelService {
 			}
 			return json && json.data;
 		})
-		.catch(error => {
+		.catch((error: any) => {
 			throw error;
 		});
 	}
 
-	async getChannelBans(channel) {
+	async getChannelBans(channel: number) {
 		return await this.ApiService.callApi('/channel/bans', {
 			method: 'POST',
 			headers: {
@@ -39,29 +41,29 @@ export default class ChannelService {
 				channel
 			})
 		})
-		.then(response => response.json())
-		.then(async (json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then(async (json: {statusCode: number; data: any[];}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
 			if (json.statusCode !== 200) {
 				return Promise.reject(json);
 			}
-			let bans = [];
+			let bans: any[] = [];
 			if(json && json.data){
-				await json.data.forEach(async (data) => {
+				await json.data.forEach(async (data: {user_id: any;}) => {
 					if(bans.indexOf(data.user_id) > -1) return;
 					bans.push(data.user_id);
 				})
 			}
 			return bans;
 		})
-		.catch(error => {
+		.catch((error: any) => {
 			throw error;
 		});
 	}
 
-	async getChannelTimeouts(channel) {
+	async getChannelTimeouts(channel: number) {
 		return await this.ApiService.callApi('/channel/timeouts', {
 			method: 'POST',
 			headers: {
@@ -72,8 +74,8 @@ export default class ChannelService {
 				channel
 			})
 		})
-		.then(response => response.json())
-		.then(async (json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then(async (json: {statusCode: number; data: any[];}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -82,23 +84,23 @@ export default class ChannelService {
 			}
 			let timeouts = new Map();
 			if(json && json.data){
-				await json.data.forEach(async (data) => {
+				await json.data.forEach(async (data: {name: any; time: any;}) => {
 					if(timeouts.has(data.name)) return;
 					timeouts.set(data.name, data.time);
 				});
 			}
 			return timeouts;
 		})
-		.catch(error => {
+		.catch((error: any) => {
 			throw error;
 		});
 	}
 
-	async channelUserMod(channel, user, type = 'user_id') {
+	async channelUserMod(channel: number, user: number, type = 'user_id') {
 		let json = {
-				channel
+				channel,
+				[type]: user
 		};
-		json[type] = user;
 		return await this.ApiService.callApi('/channel/userMod', {
 			method: 'POST',
 			headers: {
@@ -107,8 +109,8 @@ export default class ChannelService {
 			accessToken: process.env.API_SECRET,
 			body: JSON.stringify(json)
 		})
-		.then(response => response.json())
-		.then((json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then((json: {statusCode: number;}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -117,16 +119,16 @@ export default class ChannelService {
 			}
 			return json;
 		})
-		.catch(error => {
-			throw error;
+		.catch((error: any) => {
+			return {};
 		});
 	}
 
-	async channelUserUnmod(channel, user, type = 'user_id') {
+	async channelUserUnmod(channel: number, user: number, type = 'user_id') {
 		let json = {
-				channel
+				channel,
+				[type]: user
 		};
-		json[type] = user;
 		return await this.ApiService.callApi('/channel/userUnmod', {
 			method: 'POST',
 			headers: {
@@ -135,8 +137,8 @@ export default class ChannelService {
 			accessToken: process.env.API_SECRET,
 			body: JSON.stringify(json)
 		})
-		.then(response => response.json())
-		.then((json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then((json: {statusCode: number;}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -145,16 +147,16 @@ export default class ChannelService {
 			}
 			return json;
 		})
-		.catch(error => {
-			throw error;
+		.catch((error: any) => {
+			return {};
 		});
 	}
 
-	async channelUserBan(channel, user, type = 'user_id') {
+	async channelUserBan(channel: number, user: number, type = 'user_id') {
 		let json = {
-				channel
+				channel,
+				[type]: user
 		};
-		json[type] = user;
 		return await this.ApiService.callApi('/channel/userBan', {
 			method: 'POST',
 			headers: {
@@ -163,8 +165,8 @@ export default class ChannelService {
 			accessToken: process.env.API_SECRET,
 			body: JSON.stringify(json)
 		})
-		.then(response => response.json())
-		.then((json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then((json: {statusCode: number;}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -173,16 +175,16 @@ export default class ChannelService {
 			}
 			return json;
 		})
-		.catch(error => {
+		.catch((error: any) => {
 			throw error;
 		});
 	}
 
-	async channelUserUnban(channel, user, type = 'user_id') {
+	async channelUserUnban(channel: number, user: number, type = 'user_id') {
 		let json = {
-				channel
+				channel,
+				[type]: user
 		};
-		json[type] = user;
 		return await this.ApiService.callApi('/channel/userUnban', {
 			method: 'POST',
 			headers: {
@@ -191,8 +193,8 @@ export default class ChannelService {
 			accessToken: process.env.API_SECRET,
 			body: JSON.stringify(json)
 		})
-		.then(response => response.json())
-		.then((json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then((json: {statusCode: number;}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -201,17 +203,17 @@ export default class ChannelService {
 			}
 			return json;
 		})
-		.catch(error => {
+		.catch((error: any) => {
 			throw error;
 		});
 	}
 
-	async channelUserTimeout(channel, user, timeout = 0, type = 'user_id') {
+	async channelUserTimeout(channel: number, user: number, timeout = 0, type = 'user_id') {
 		let json = {
 				channel,
-				timeout
+				timeout,
+				[type]: user
 		};
-		json[type] = user;
 		return await this.ApiService.callApi('/channel/userTimeout', {
 			method: 'POST',
 			headers: {
@@ -220,8 +222,8 @@ export default class ChannelService {
 			accessToken: process.env.API_SECRET,
 			body: JSON.stringify(json)
 		})
-		.then(response => response.json())
-		.then((json) => {
+		.then((response: {json: () => any;}) => response.json())
+		.then((json: {statusCode: number;}) => {
 			if (!('statusCode' in json)) {
 				return Promise.reject(json);
 			}
@@ -230,7 +232,7 @@ export default class ChannelService {
 			}
 			return json;
 		})
-		.catch(error => {
+		.catch((error: any) => {
 			throw error;
 		});
 	}
